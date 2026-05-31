@@ -95,6 +95,7 @@ dependencies = [
     { name = "torch", version = "2.10.0+cu129", source = { registry = "https://download.pytorch.org/whl/cu129" }, marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "transformers", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
     { name = "typer", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
+    { name = "wandb", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
     { name = "xopen", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
 ]
 
@@ -125,6 +126,7 @@ requires-dist = [
     { name = "transformers", specifier = ">=4.50.0" },
     { name = "typer", specifier = ">=0.15.4" },
     { name = "vllm", marker = "extra == 'gpu'", specifier = "==0.19.1" },
+    { name = "wandb", specifier = ">=0.26.1" },
     { name = "wandb", marker = "extra == 'gpu'", specifier = ">=0.26.0" },
     { name = "wandb", marker = "extra == 'plots'", specifier = ">=0.26.0" },
     { name = "xopen", specifier = ">=2.0.2" },

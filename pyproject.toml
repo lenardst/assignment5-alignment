@@ -15,6 +15,7 @@ dependencies = [
     "typer>=0.15.4",
     "xopen>=2.0.2",
     "matplotlib>=3.10.9",
+    "wandb>=0.26.1",
 ]
 
 [project.optional-dependencies]
