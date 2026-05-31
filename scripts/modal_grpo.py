@@ -67,6 +67,8 @@ def _make_args(
     advantage_normalizer: str = "std",
     loss_normalization: str = "sequence",
     num_rollout_steps: int = 200,
+    importance_reweighting_method: str = "none",
+    cliprange: float | None = None,
     run_name: str | None = None,
 ) -> list[str]:
     """Build CLI arguments (no interpreter prefix; run_grpo prepends it)."""
@@ -82,8 +84,11 @@ def _make_args(
         "--advantage-normalizer", advantage_normalizer,
         "--loss-normalization",   loss_normalization,
         "--num-rollout-steps",    str(num_rollout_steps),
+        "--importance-reweighting-method", importance_reweighting_method,
         "--wandb-project", "cs336-a5-grpo",
     ]
+    if cliprange is not None:
+        args += ["--cliprange", str(cliprange)]
     if run_name:
         args += ["--run-name", run_name]
     return args
@@ -252,6 +257,93 @@ def variants_on_policy(
             )
         )
     print(f"Submitting {len(commands)} jobs: variants_on_policy", flush=True)
+    failures = []
+    for idx, result in enumerate(run_grpo.map(commands, return_exceptions=True)):
+        if isinstance(result, BaseException):
+            print(f"FAILED [{idx}]: {result!r}", flush=True)
+            failures.append(idx)
+        else:
+            print(f"Done [{idx}]: {result}", flush=True)
+    if failures:
+        raise SystemExit(f"{len(failures)} jobs failed")
+
+
+# ---------------------------------------------------------------------------
+# 5. Off-policy variants
+# ---------------------------------------------------------------------------
+
+OFF_POLICY_CONFIGS = {
+    "offpolicy_naive":  dict(importance_reweighting_method="none",  cliprange=None),
+    "offpolicy_noclip": dict(importance_reweighting_method="noclip", cliprange=None),
+    "offpolicy_clip":   dict(importance_reweighting_method="grpo",   cliprange=0.2),
+    "offpolicy_gspo":   dict(importance_reweighting_method="gspo",   cliprange=3e-4),
+}
+
+
+@app.local_entrypoint(name="off_policy")
+def off_policy(
+    seeds: str = "0,1,2,3",
+    learning_rate: float = 1e-5,
+    num_rollout_steps: int = 200,
+    variants: str = "offpolicy_naive,offpolicy_noclip,offpolicy_clip,offpolicy_gspo",
+) -> None:
+    commands = []
+    for variant, s in product(variants.split(","), seeds.split(",")):
+        cfg = OFF_POLICY_CONFIGS[variant]
+        commands.append(
+            _make_args(
+                seed=int(s),
+                prompt="r1_zero",
+                output_subdir=f"off_policy/{variant}",
+                learning_rate=learning_rate,
+                baseline="mean",
+                advantage_normalizer="std",
+                loss_normalization="sequence",
+                num_rollout_steps=num_rollout_steps,
+                run_name=f"{variant}_seed{s}",
+                **cfg,
+            )
+        )
+    print(f"Submitting {len(commands)} jobs: off_policy", flush=True)
+    failures = []
+    for idx, result in enumerate(run_grpo.map(commands, return_exceptions=True)):
+        if isinstance(result, BaseException):
+            print(f"FAILED [{idx}]: {result!r}", flush=True)
+            failures.append(idx)
+        else:
+            print(f"Done [{idx}]: {result}", flush=True)
+    if failures:
+        raise SystemExit(f"{len(failures)} jobs failed")
+
+
+# ---------------------------------------------------------------------------
+# 6. LOO-GRPO vs Dr.GRPO (custom estimator)
+# ---------------------------------------------------------------------------
+
+@app.local_entrypoint(name="loo_grpo")
+def loo_grpo(
+    seeds: str = "0,1,2,3",
+    learning_rate: float = 1e-5,
+    num_rollout_steps: int = 200,
+) -> None:
+    commands = []
+    for variant, s in product(["loo_grpo", "dr_grpo_baseline"], seeds.split(",")):
+        if variant == "loo_grpo":
+            cfg = dict(baseline="loo", advantage_normalizer="none", loss_normalization="constant")
+        else:
+            cfg = dict(baseline="mean", advantage_normalizer="none", loss_normalization="constant")
+        commands.append(
+            _make_args(
+                seed=int(s),
+                prompt="r1_zero",
+                output_subdir=f"loo_grpo/{variant}",
+                learning_rate=learning_rate,
+                num_rollout_steps=num_rollout_steps,
+                run_name=f"{variant}_seed{s}",
+                **cfg,
+            )
+        )
+    print(f"Submitting {len(commands)} jobs: loo_grpo", flush=True)
     failures = []
     for idx, result in enumerate(run_grpo.map(commands, return_exceptions=True)):
         if isinstance(result, BaseException):

@@ -52,7 +52,7 @@ def run_compute_rollout_rewards(
 def run_compute_group_normalized_rewards(
     raw_rewards: torch.Tensor,
     group_size: int,
-    baseline: Literal["mean", "none"] = "mean",
+    baseline: Literal["mean", "none", "loo"] = "mean",
     advantage_eps: float = 1e-6,
     advantage_normalizer: Literal["std", "none", "mean"] = "std",
 ) -> tuple[torch.Tensor, dict[str, float]]:
@@ -108,7 +108,7 @@ def run_grpo_train_step(
     rollout_responses: list[str],
     repeated_ground_truths: list[str],
     group_size: int,
-    baseline: Literal["mean", "none"] = "mean",
+    baseline: Literal["mean", "none", "loo"] = "mean",
     advantage_eps: float = 1e-6,
     advantage_normalizer: Literal["std", "none", "mean"] = "std",
     importance_reweighting_method: Literal["none", "noclip", "grpo", "gspo"] = "none",

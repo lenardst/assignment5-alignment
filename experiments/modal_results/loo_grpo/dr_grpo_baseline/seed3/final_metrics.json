@@ -1,0 +1,7 @@
+{
+  "val/reward": 0.400390625,
+  "val/format_reward": 0.7861328125,
+  "val/mean_response_length": 125.0615234375,
+  "val/n_examples": 1024,
+  "seed": 3
+}

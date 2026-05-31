@@ -285,7 +285,26 @@ def train(args: argparse.Namespace) -> None:
             for _ in range(args.group_size)
         ]
 
-        # 4. GRPO train step
+        # 4a. Compute old log-probs for off-policy importance reweighting
+        old_log_probs = None
+        if args.importance_reweighting_method != "none":
+            old_batch = tokenize_prompt_and_output(
+                prompt_strs=repeated_prompts,
+                output_strs=rollout_responses,
+                tokenizer=tokenizer,
+            )
+            policy.eval()
+            with torch.no_grad():
+                old_out = get_response_log_probs(
+                    model=policy,
+                    input_ids=old_batch["input_ids"].to(policy_device),
+                    labels=old_batch["labels"].to(policy_device),
+                )
+            old_log_probs = old_out["log_probs"]
+            policy.train()
+
+        # 4b. GRPO train step
+        cliprange = args.cliprange if args.importance_reweighting_method in ("grpo", "gspo") else None
         loss, metadata = grpo_train_step(
             model=policy,
             tokenizer=tokenizer,
@@ -300,7 +319,9 @@ def train(args: argparse.Namespace) -> None:
             baseline=args.baseline,
             advantage_eps=args.advantage_eps,
             advantage_normalizer=args.advantage_normalizer,
-            importance_reweighting_method="none",
+            importance_reweighting_method=args.importance_reweighting_method,
+            old_log_probs=old_log_probs,
+            cliprange=cliprange,
             loss_normalization=args.loss_normalization,
             normalization_constant=normalization_constant if args.loss_normalization == "constant" else None,
         )
@@ -314,6 +335,9 @@ def train(args: argparse.Namespace) -> None:
             "train/std_reward": float(metadata.get("std_reward", 0.0)),
             "train/step_time_s": dt,
         }
+        if "clip_fraction" in metadata:
+            cf = metadata["clip_fraction"]
+            step_metrics["train/clip_fraction"] = float(cf.item() if hasattr(cf, "item") else cf)
         log(step_metrics, global_step)
 
         # 5. Periodic validation
@@ -403,10 +427,14 @@ def make_parser() -> argparse.ArgumentParser:
     p.add_argument("--gradient-accumulation-steps", type=int, default=32)
     p.add_argument("--max-grad-norm",    type=float, default=1.0)
     # GRPO variant knobs
-    p.add_argument("--baseline",         default="mean", choices=["mean", "none"])
+    p.add_argument("--baseline",         default="mean", choices=["mean", "none", "loo"])
     p.add_argument("--advantage-normalizer", default="std", choices=["std", "none", "mean"])
     p.add_argument("--advantage-eps",    type=float, default=1e-6)
     p.add_argument("--loss-normalization", default="sequence", choices=["sequence", "constant"])
+    # Off-policy importance reweighting
+    p.add_argument("--importance-reweighting-method", default="none",
+                   choices=["none", "noclip", "grpo", "gspo"])
+    p.add_argument("--cliprange",        type=float, default=0.2)
     # Sampling
     p.add_argument("--sampling-temperature", type=float, default=1.0)
     p.add_argument("--sampling-max-tokens",  type=int,   default=512)

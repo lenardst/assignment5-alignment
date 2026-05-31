@@ -109,7 +109,7 @@ def compute_rollout_rewards(
 def compute_group_normalized_rewards(
     raw_rewards: Tensor,
     group_size: int,
-    baseline: Literal["mean", "none"] = "mean",
+    baseline: Literal["mean", "none", "loo"] = "mean",
     advantage_eps: float = 1e-6,
     advantage_normalizer: Literal["std", "none", "mean"] = "std",
 ) -> tuple[Tensor, dict[str, float]]:
@@ -121,6 +121,11 @@ def compute_group_normalized_rewards(
         centered = rewards - group_mean
     elif baseline == "none":
         centered = rewards.clone()
+    elif baseline == "loo":
+        G = group_size
+        # leave-one-out mean for sample j: (G*mean - r_j) / (G-1)
+        loo_baseline = (G * group_mean - rewards) / max(G - 1, 1)
+        centered = rewards - loo_baseline
     else:
         raise NotImplementedError(f"baseline={baseline!r}")
 
@@ -238,7 +243,7 @@ def grpo_train_step(
     rollout_responses: list[str],
     repeated_ground_truths: list[str],
     group_size: int,
-    baseline: Literal["mean", "none"] = "mean",
+    baseline: Literal["mean", "none", "loo"] = "mean",
     advantage_eps: float = 1e-6,
     advantage_normalizer: Literal["std", "none", "mean"] = "std",
     importance_reweighting_method: Literal["none", "noclip", "grpo", "gspo"] = "none",
@@ -266,27 +271,7 @@ def grpo_train_step(
     )
     raw_rewards = raw_rewards.to(device)
 
-    # For RFT (baseline="none", advantage_normalizer="none"): skip zero-advantage rows
-    # to save compute. Zero advantage ↔ reward == 0 (since no baseline subtraction).
-    if baseline == "none" and advantage_normalizer == "none":
-        nonzero_mask = (raw_rewards != 0)
-        if nonzero_mask.any() and not nonzero_mask.all():
-            input_ids     = input_ids[nonzero_mask]
-            labels        = labels[nonzero_mask]
-            response_mask = response_mask[nonzero_mask]
-            if old_log_probs is not None:
-                old_log_probs_filtered = old_log_probs[nonzero_mask].to(device)
-            else:
-                old_log_probs_filtered = None
-            raw_rewards = raw_rewards[nonzero_mask]
-            # Reduce gradient_accumulation_steps proportionally (keep microbatch size ≥ 1)
-            eff_batch = input_ids.shape[0]
-            micro_size = max(1, input_ids.shape[0] // gradient_accumulation_steps)
-            gradient_accumulation_steps = max(1, eff_batch // micro_size)
-        else:
-            old_log_probs_filtered = old_log_probs.to(device) if old_log_probs is not None else None
-    else:
-        old_log_probs_filtered = old_log_probs.to(device) if old_log_probs is not None else None
+    old_log_probs_filtered = old_log_probs.to(device) if old_log_probs is not None else None
 
     advantages, adv_meta = compute_group_normalized_rewards(
         raw_rewards=raw_rewards,
