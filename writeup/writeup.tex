@@ -219,45 +219,28 @@ Assistant: \texttt{<think>}\\[4pt]
 \subsection*{(b) Characterizing model behavior}
 
 \paragraph{\texttt{question\_only}.}
-The base model treats the question-only prompt as a signal to continue
-generating math-education content rather than to answer the posed problem. In
-the vast majority of outputs (76.8\% Cat.~3) the model produces one of several
-patterns: (i) it appends additional, unrelated word problems immediately after
-the question; (ii) it generates LaTeX snippets, explanatory figures, or
-\texttt{overpic} boilerplate; or (iii) it outputs near-nonsense tokens (``Pet
-Pet Pet\ldots''). The \verb|\boxed{}| convention is essentially absent from
-pretraining continuations, so even when arithmetic appears it is almost never
-wrapped correctly. The lone Cat.~1 success happens to generate a fully
-formatted LaTeX solution and \verb|\boxed{350}| because the question's phrasing
-happened to resemble a textbook example.
+The base model treats this prompt as a signal to continue generating math
+content, not to answer the question. Most outputs (76.8\% Cat.~3) append
+unrelated word problems, emit LaTeX boilerplate, or repeat near-nonsense tokens
+(``Pet Pet Pet\ldots''). The \verb|\boxed{}| convention rarely appears, so even
+correct arithmetic is almost never wrapped right. Plain prompting does not put
+the base model in a task-solving mode.
 
 \paragraph{\texttt{r1\_zero}.}
-Pre-seeding \texttt{<think>} and framing the prompt as a conversation between
-User and Assistant substantially constrains the output: the format rate rises to
-62.0\%. The model mostly produces a plausible-sounding reasoning chain before
-\texttt{</think>}, then emits a numeric answer in \texttt{<answer>} tags.
-However, the arithmetic is almost always wrong: the model shortcircuits
-multi-step problems (e.g., computing 12 hours total instead of counting
-twice-weekly sessions at 2 hours each), invents irrelevant formulas, or hedges
-with an expression instead of a numeric value. Cat.~3 failures (38.0\%) occur
-when the model (a) opens \texttt{<think>} but never closes it before the
-512-token limit, (b) writes an answer after \texttt{</think>} but outside
-\texttt{<answer>} tags, or (c) appends an extra ``User:'' turn mid-generation,
-breaking the expected format.
+Pre-seeding \texttt{<think>} and the User/Assistant frame raise the format rate
+to 62.0\%. The model produces a reasoning chain before \texttt{</think>}, then
+a numeric answer in \texttt{<answer>} tags. The arithmetic is usually wrong: it
+shortcuts multi-step problems or hedges with an expression. Cat.~3 failures
+(38.0\%) come from never closing \texttt{<think>}, writing the answer outside
+\texttt{<answer>} tags, or appending an extra ``User:'' turn. The prompt shapes
+format but not correctness.
 
 \paragraph{\texttt{r1\_zero\_three\_shot}.}
-Three worked examples sharply focus the output distribution: the format rate
-rises to 95.0\% and accuracy jumps to 18.65\%. The demonstrations teach the
-model the expected trajectory length and stylistic register—short, step-by-step
-arithmetic chains ending with a single number inside \texttt{<answer>}—which
-dramatically reduces chat-style derailments. The model imitates the concise
-style of the demonstrations faithfully, but still commits systematic arithmetic
-errors (wrong multipliers, misinterpreted units, sign errors). Cat.~3 failures
-drop to just 5.0\%; these are mostly outputs that close \texttt{</think>} but
-stop without ever opening \texttt{<answer>}, or that are cut off at the 512-token
-limit before reaching the closing \texttt{</answer>} tag. As noted above,
-roughly 20\% of Cat.~3 cases from this prompt are actually correct answers that
-the parser misses because the \texttt{<answer>} wrapper is absent.
+Three worked examples raise the format rate to 95.0\% and accuracy to 18.65\%.
+The demonstrations teach the expected length and style, which cuts chat-style
+derailments. Cat.~3 failures drop to 5.0\%, mostly outputs that close
+\texttt{</think>} without opening \texttt{<answer>}. Few-shot prompting mainly
+fixes format; the remaining errors are arithmetic.
 
 % =====================================================
 \section{Group Relative Policy Optimization}
@@ -325,7 +308,7 @@ For the mean over $n$ samples:
 \boxed{\;\Var\!\left[\frac{1}{n}\sum_{i=1}^n (r(A_i)-b)\nabla_\theta \log \policy(A_i)\right]
 = \frac{p(1-p)(1-p-b)^2}{n}.\;}
 \]
-The variance is minimized at $b^\star = 1-p$, where it equals zero. The optimal baseline is therefore not the expected reward $p$. It is $1-p$. The reason is that the score function $\nabla_\theta \log \policy(A)$ already has nonzero magnitude on $A=0$, so the baseline must compensate for that side too.
+The variance is minimized at $b^\star = 1-p$, where it equals zero. The optimal baseline is $1-p$, not the expected reward $p$. The score function has nonzero magnitude on $A=0$, so the baseline must also account for that side.
 
 \subsection*{(c) Variance with the population-mean baseline $b=p$}
 Substituting $b=p$ in part (b):
@@ -345,45 +328,45 @@ The baseline-adjusted variance is lower than the unadjusted variance when $p \le
 Prompt and output tokenization (1 point).
 \end{problembox}
 \deliverable{Implement \texttt{tokenize\_prompt\_and\_output}.}
-\textbf{Test status:} passing. The prompt and output are tokenized separately without special tokens. The two token lists are concatenated and right-padded to the longest sequence in the batch. The final position is dropped from \texttt{input\_ids} and the first position is dropped from \texttt{labels}, giving the standard shift-by-one alignment. The \texttt{response\_mask} is shifted the same way as \texttt{labels} and is true on the positions of response tokens only.
+Implemented in \texttt{tests/adapters.py}. Test passes.
 
 \begin{problembox}{get\_response\_log\_probs}
 Response log-probs (and entropy) (1 point).
 \end{problembox}
 \deliverable{Implement \texttt{get\_response\_log\_probs}.}
-\textbf{Test status:} passing. The model produces logits of shape (B, T, V). We take a log-softmax over the vocabulary and gather the label log-probability at each position. Entropy is computed in a numerically stable way as $-\sum_v \exp(\log p_v) \log p_v$ using the same log-softmax.
+Implemented in \texttt{tests/adapters.py}. Test passes.
 
 \begin{problembox}{compute\_rollout\_rewards}
 Computing the rewards of rollouts (1 point).
 \end{problembox}
 \deliverable{Implement \texttt{compute\_rollout\_rewards}.}
-\textbf{Test status:} passing. The reward function is called on every (response, ground truth) pair. The total, format, and answer rewards are collected. The total reward tensor is returned alongside mean reward statistics for logging.
+Implemented in \texttt{tests/adapters.py}. Test passes.
 
 \begin{problembox}{compute\_group\_normalized\_rewards\_grpo}
 Group normalization (1 point).
 \end{problembox}
 \deliverable{Implement \texttt{compute\_group\_normalized\_rewards} with
 \texttt{baseline="mean"}, \texttt{advantage\_normalizer="std"}.}
-\textbf{Test status:} passing. Rewards are reshaped to (n\_prompts, group\_size). The per-group mean is subtracted and the per-group std is divided out. A small \texttt{advantage\_eps} is added to the std before division to avoid divide-by-zero when all rewards in a group are equal.
+Implemented in \texttt{tests/adapters.py}. Test passes.
 
 \begin{problembox}{compute\_policy\_gradient\_loss\_on\_policy}
 On-policy policy gradient (1 point).
 \end{problembox}
 \deliverable{Implement \texttt{compute\_policy\_gradient\_loss} with
 \texttt{importance\_reweighting\_method = "none"}.}
-\textbf{Test status:} passing. The per-token loss is $-A \cdot \log \policy(y_t \mid x, y_{<t})$. The advantage is broadcast across the sequence dimension. Aggregation across tokens happens in \texttt{aggregate\_loss\_across\_microbatch}.
+Implemented in \texttt{tests/adapters.py}. Test passes.
 
 \begin{problembox}{aggregate\_loss\_across\_microbatch\_sequence}
 Aggregate loss across tokens and sequences (0.5 points).
 \end{problembox}
 \deliverable{Implement \texttt{aggregate\_loss\_across\_microbatch} with \texttt{loss\_normalization = "sequence"}.}
-\textbf{Test status:} passing. The per-token loss is masked by the response mask. Each sequence is divided by its own response-token count to get a per-sequence average. The per-sequence averages are then averaged over the microbatch.
+Implemented in \texttt{tests/adapters.py}. Test passes.
 
 \begin{problembox}{grpo\_train\_step\_standard\_on\_policy}
 GRPO train step (5 points).
 \end{problembox}
 \deliverable{Implement \texttt{grpo\_train\_step} for the standard on-policy GRPO setting.}
-\textbf{Test status:} passing. The full batch is tokenized once. Rewards and group-normalized advantages are computed once. The batch is then split into \texttt{gradient\_accumulation\_steps} microbatches. Each microbatch runs a forward pass and a backward pass. For sequence normalization the microbatch loss is divided by \texttt{gradient\_accumulation\_steps} so the accumulated gradient equals the full-batch average. For constant normalization the microbatch loss is already a partial sum and is not rescaled. The gradient norm is clipped to \texttt{max\_grad\_norm} before the optimizer step. Logged metrics include loss, gradient norm, mean reward, mean format reward, mean answer reward, and any per-loss metadata such as clip fraction.
+Implemented in \texttt{tests/adapters.py}. Test passes.
 
 % -----------------------------------------------------
 \subsection{Experiments}
@@ -489,25 +472,19 @@ Think about length normalization (1 point).
 \end{problembox}
 \deliverable{A few sentences of discussion.}
 
-Per-sequence length normalization first averages the loss over the tokens of each sequence and then averages over sequences. Each sequence contributes equally to the loss. A long sequence gets a smaller per-token weight than a short sequence.
-
-Constant normalization divides the summed loss by a fixed number $Z = BGL$. Each token contributes equally to the loss. A long sequence contributes more to the gradient than a short sequence.
-
-Per-sequence normalization is more robust when response lengths vary a lot inside a batch. It prevents long rollouts from dominating the gradient. The downside is a bias toward shorter sequences. Per-token weight is higher for short ones, so the model can learn to truncate.
-
-Constant normalization is more faithful to the original policy gradient. It treats every token as an equal action and matches the derivation in Section 4.1. The downside is high variance across batches with different total token counts.
+Per-sequence normalization gives every sequence equal weight. A long sequence gets a smaller per-token weight than a short one. This prevents long rollouts from dominating the gradient, but it biases the model toward shorter answers. Constant normalization gives every token equal weight. It is more faithful to the policy gradient, but its scale varies with the total token count in the batch. Per-sequence normalization is better when response lengths vary a lot. Constant normalization is better when you want an unbiased estimate.
 
 \begin{problembox}{compute\_group\_normalized\_rewards\_drgrpo}
 Dr.\ GRPO group normalization (0.5 points).
 \end{problembox}
 \deliverable{Update \texttt{compute\_group\_normalized\_rewards} to support \texttt{advantage\_normalizer = "none"} and \texttt{baseline = "none"}.}
-\textbf{Test status:} passing. The implementation branches on \texttt{baseline} and \texttt{advantage\_normalizer}. The \texttt{none} options skip mean-subtraction and skip std-division respectively.
+Implemented in \texttt{tests/adapters.py}. Test passes.
 
 \begin{problembox}{aggregate\_loss\_across\_microbatch\_constant}
 Dr.\ GRPO loss aggregation (0.5 points).
 \end{problembox}
 \deliverable{Update \texttt{aggregate\_loss\_across\_microbatch} to support \texttt{loss\_normalization = "constant"}.}
-\textbf{Test status:} passing. The masked loss is summed over all tokens in the microbatch and divided by the fixed \texttt{normalization\_constant}. The microbatch loss is therefore already a partial sum and is not rescaled by the train step.
+Implemented in \texttt{tests/adapters.py}. Test passes.
 
 % --------------------------
 \subsection{Rejection fine tuning}
@@ -517,24 +494,7 @@ Think about RFT (2 points).
 \end{problembox}
 \deliverable{A few sentences of discussion.}
 
-The RFT estimator only touches correct rollouts:
-\[
-g_{\text{RFT}} = \frac{1}{Z}\sum_x \sum_j \mathbf{1}\{r(y^{(j)}|x)=1\}\,\nabla_\theta\log\policy(y^{(j)}|x).
-\]
-The on-policy Dr.\ GRPO estimator touches all rollouts but centers by the group mean $\mu$:
-\[
-g_{\text{Dr.GRPO}} = \frac{1}{Z}\sum_x \sum_j (r(y^{(j)}|x) - \mu)\,\nabla_\theta\log\policy(y^{(j)}|x).
-\]
-
-\paragraph{Expectation.} Both have the same expectation in the on-policy limit. For binary reward,
-\[
-\E_{y\sim\policy}[\mathbf{1}\{r=1\}\nabla\log\policy(y|x)] = \E_y[r\nabla\log\policy(y|x)] = \nabla_\theta \eta(x),
-\]
-where $\eta(x) = \E_y[r(y|x)]$. The mean-subtracted Dr.\ GRPO term also reduces to $\nabla\eta(x)$ in the $G\to\infty$ limit because $\mu \to \eta(x)$ and $\E_y[\nabla\log\policy] = 0$.
-
-\paragraph{Variance.} Dr.\ GRPO subtracts the group mean. This is a valid baseline. It reduces variance when the reward and the score function are positively correlated, which is the common case. RFT keeps a positive log-prob term on every correct sample and zero on every incorrect one. Its variance is generally higher because it skips the baseline correction.
-
-\paragraph{When to prefer each.} RFT is simpler and more stable when the group reward is near 0 or 1, since $\mu$ goes to a constant and Dr.\ GRPO's centering does almost nothing. RFT is also a natural choice if you only have access to correct rollouts. Dr.\ GRPO is preferable when groups have mixed rewards, since the baseline gives a real variance reduction.
+Both objectives have the same expectation for binary reward. RFT keeps a $\nabla\log\policy$ term on correct samples only. Dr.\ GRPO keeps the same term on all samples but subtracts the group mean. For binary reward $\E_y[\mathbf{1}\{r=1\}\nabla\log\policy] = \E_y[r\,\nabla\log\policy]$, and the mean subtraction in Dr.\ GRPO adds zero in expectation. So both estimate $\nabla\eta(x)$. Dr.\ GRPO has lower variance because the group mean is a valid baseline. RFT skips this correction. I would prefer RFT when most groups are all-correct or all-wrong, since the baseline then does almost nothing and RFT is simpler. I would prefer Dr.\ GRPO when groups have mixed rewards, since the baseline gives a real variance reduction.
 
 % --------------------------
 \subsection{MaxRL}
@@ -589,21 +549,13 @@ Think about advantage normalization (2 points).
 \end{problembox}
 \deliverable{A few sentences of discussion.}
 
-The three options give different difficulty reweightings (see the derivation above). They also have different bias and variance.
-
-\textbf{std normalization} keeps the gradient norm roughly constant across groups. Every group contributes a similar update size. This is good for stability. The cost is a bias toward easy and hard prompts. The std blows up the weight at the extremes of $\eta$.
-
-\textbf{mean normalization} (MaxRL) upweights hard prompts. This is good for curriculum-like training, since hard prompts are exactly the ones the model needs to learn. The cost is instability when $\mu$ is small. The weight $1/\mu$ can grow without bound.
-
-\textbf{no normalization} (Dr.\ GRPO) is the unbiased policy gradient and weights all prompts equally. This is the safest choice in theory. The cost is high variance in gradient norm across groups.
-
-Use std when training is unstable and prompt difficulty is roughly uniform. Use mean when the dataset has many easy prompts and you want the model to focus on the hard tail. Use none when you want unbiased estimation and have enough samples to absorb the variance.
+The three options trade off stability against bias. Std normalization keeps the gradient norm roughly equal across groups, which helps stability, but it upweights very easy and very hard prompts. Mean normalization (MaxRL) upweights hard prompts, which suits curriculum-like training, but it is unstable when the group mean is small. No normalization (Dr.\ GRPO) is the unbiased policy gradient and weights all prompts equally, but the gradient norm then varies a lot across groups. Use std when training is unstable. Use mean when the dataset has many easy prompts and you want to focus on the hard tail. Use none when you want an unbiased estimate.
 
 \begin{problembox}{compute\_group\_normalized\_rewards\_maxrl}
 MaxRL group normalization (0.5 points).
 \end{problembox}
 \deliverable{Update \texttt{compute\_group\_normalized\_rewards} to support \texttt{advantage\_normalizer = "mean"}.}
-\textbf{Test status:} passing. The branch divides the centered advantage by the per-group mean plus \texttt{advantage\_eps}.
+Implemented in \texttt{tests/adapters.py}. Test passes.
 
 % --------------------------
 \subsection{Experiments}
@@ -612,7 +564,7 @@ MaxRL group normalization (0.5 points).
 GRPO train step variants (2.5 points).
 \end{problembox}
 \deliverable{Update \texttt{grpo\_train\_step} to support the full range of on-policy variants.}
-\textbf{Test status:} passing for all four variants (\texttt{grpo\_constant}, \texttt{dr\_grpo}, \texttt{rft}, \texttt{maxrl}). The train step takes \texttt{baseline}, \texttt{advantage\_normalizer}, and \texttt{loss\_normalization} as arguments and dispatches to the right code path. Zero-advantage sequences can be skipped by checking \texttt{advantages != 0} after group normalization. This saves a forward and a backward pass for groups with all-equal rewards (under \texttt{baseline="mean"}) and for incorrect samples (under \texttt{baseline="none"}).
+Implemented in \texttt{tests/adapters.py}. Tests pass for all four variants. Zero-advantage sequences are skipped before the forward pass to save compute.
 
 \begin{problembox}{grpo\_experiments\_variants\_on\_policy}
 Compare the performance of different RL algorithms (10 points).
@@ -678,19 +630,19 @@ Summing over $t$ and over $x$ recovers the given pairwise estimator. So the surr
 Off-policy policy gradient with token-level reweighting (1 point).
 \end{problembox}
 \deliverable{Update \texttt{compute\_policy\_gradient\_loss} to support \texttt{importance\_reweighting\_method = "noclip"} or \texttt{"grpo"}.}
-\textbf{Test status:} passing for both \texttt{noclip} and \texttt{grpo}. The per-token importance ratio is $\exp(\log\policy(y_t) - \log\policyold(y_t))$. \texttt{noclip} multiplies the advantage by this ratio. \texttt{grpo} also computes a clipped ratio and takes the per-token minimum of $A\cdot\rho$ and $A\cdot\text{clip}(\rho, 1-\varepsilon, 1+\varepsilon)$. The clip fraction is logged for diagnostics.
+Implemented in \texttt{tests/adapters.py}. Tests pass for both \texttt{noclip} and \texttt{grpo}.
 
 \begin{problembox}{compute\_policy\_gradient\_loss\_off\_policy\_gspo}
 Off-policy policy gradient with sequence-level reweighting (1 point).
 \end{problembox}
 \deliverable{Update \texttt{compute\_policy\_gradient\_loss} to support \texttt{importance\_reweighting\_method = "gspo"}.}
-\textbf{Test status:} passing. The geometric mean of the per-token ratio is computed in log space. The per-token log-ratio is averaged over the response tokens (masked sum divided by response-token count), then exponentiated. This avoids overflow from multiplying many small ratios. The clipped sequence ratio is used the same way as in the token-level case.
+Implemented in \texttt{tests/adapters.py}. Test passes. The geometric mean is computed in log space to stay numerically stable.
 
 \begin{problembox}{grpo\_train\_step\_off\_policy}
 Off-policy GRPO train step (2.5 points).
 \end{problembox}
 \deliverable{Update \texttt{grpo\_train\_step} to support off-policy arguments.}
-\textbf{Test status:} passing for \texttt{noclip}, \texttt{grpo}, and \texttt{gspo}. The train step accepts \texttt{old\_log\_probs}, slices them per microbatch, and forwards them to the loss function. The rest of the training loop is unchanged.
+Implemented in \texttt{tests/adapters.py}. Tests pass for \texttt{noclip}, \texttt{grpo}, and \texttt{gspo}.
 
 % --------------------------
 \subsection{Experiments}
@@ -722,13 +674,7 @@ Think about importance reweighting (2 points).
 \end{problembox}
 \deliverable{A few sentences of commentary.}
 
-\textbf{(a) No reweighting.} Highest bias, lowest variance. The estimator ignores the gap between $\policy$ and $\policyold$. It works well when $\policy$ and $\policyold$ are close, for example after only a few off-policy steps. It breaks down once the policies drift apart.
-
-\textbf{(b) PPO/GRPO token-level clipped.} Medium bias, medium variance. Token-level ratios are exponential in length and would normally explode. Clipping caps each ratio in $[1-\varepsilon, 1+\varepsilon]$, which controls variance. The clip cost is bias: gradients on tokens with extreme ratios are zeroed out. This is the standard choice for off-policy LLM RL.
-
-\textbf{(c) GSPO sequence-level clipped.} Lower bias on the sequence-level objective than (b), but the raw sequence ratio has very high variance. GSPO uses the geometric mean over tokens and clips with a tiny $\varepsilon$. This is appropriate when sequences are long and the credit should be at the sequence level, not the token level.
-
-In short: pick (a) for nearly on-policy training, (b) for the standard off-policy LLM setting, and (c) for long sequences with sequence-level credit assignment.
+No reweighting has the highest bias and the lowest variance. It works when $\policy$ and $\policyold$ are close, but it breaks down once they drift apart. PPO/GRPO token-level clipping sits in the middle. It caps each ratio in $[1-\varepsilon, 1+\varepsilon]$ to control variance, at the cost of bias on clipped tokens. This is the standard choice for off-policy LLM RL. GSPO clips a sequence-level geometric-mean ratio. It is better when sequences are long and credit belongs at the sequence level. Pick no reweighting for nearly on-policy training, token-level clipping for the standard off-policy case, and GSPO for long sequences.
 
 % =====================================================
 \section{Try your own policy gradient estimator}
