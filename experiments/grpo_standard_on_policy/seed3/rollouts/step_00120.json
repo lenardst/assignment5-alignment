@@ -1,0 +1,42 @@
+[
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Summer and Jolly both went to the same middle school. However, when they finished college, Summer had five more degrees than Jolly. If Summer has a total of 150 degrees, what's the combined number of degrees they both have?\nAssistant: <think>",
+    "response": " Since Summer has five more degrees than Jolly, and Summer has 150 degrees, Jolly must have 150 - 5 = 145 degrees. The combined number of degrees they both have is 150 + 145 = 295. </think> <answer>295</answer>",
+    "ground_truth": "295"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Summer and Jolly both went to the same middle school. However, when they finished college, Summer had five more degrees than Jolly. If Summer has a total of 150 degrees, what's the combined number of degrees they both have?\nAssistant: <think>",
+    "response": " Since Summer has five more degrees than Jolly, we can say that Summer has 150 degrees and Jolly has 150 - 5 = 145 degrees. The combined number of degrees they both have is 150 + 145 = 295 degrees. </think> <answer>295</answer>",
+    "ground_truth": "295"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Summer and Jolly both went to the same middle school. However, when they finished college, Summer had five more degrees than Jolly. If Summer has a total of 150 degrees, what's the combined number of degrees they both have?\nAssistant: <think>",
+    "response": " Since Summer has 5 more degrees than Jolly, and Summer has 150 degrees, Jolly must have 150 - 5 = 145 degrees. The combined number of degrees they both have is 150 + 145 = 395. </think> <answer>395</answer>",
+    "ground_truth": "295"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Summer and Jolly both went to the same middle school. However, when they finished college, Summer had five more degrees than Jolly. If Summer has a total of 150 degrees, what's the combined number of degrees they both have?\nAssistant: <think>",
+    "response": " Since Summer has five more degrees than Jolly, we can say that Jolly has 150 - 5 = 145 degrees. The total number of degrees both Summer and Jolly have together is 150 + 145 = 295 degrees. </think> <answer>295</answer>",
+    "ground_truth": "295"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Summer and Jolly both went to the same middle school. However, when they finished college, Summer had five more degrees than Jolly. If Summer has a total of 150 degrees, what's the combined number of degrees they both have?\nAssistant: <think>",
+    "response": " Since Summer has five more degrees than Jolly, we can set up the equation: Jolly's degrees + 5 = 150. So, Jolly's degrees = 150 - 5 = 145. The combined number of degrees they both have is 145 + 150 = 295. </think> <answer>295</answer>",
+    "ground_truth": "295"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Summer and Jolly both went to the same middle school. However, when they finished college, Summer had five more degrees than Jolly. If Summer has a total of 150 degrees, what's the combined number of degrees they both have?\nAssistant: <think>",
+    "response": " Since Summer has five more degrees than Jolly, we can set up the relationship as: Summer's degrees = Jolly's degrees + 5. We also know that Summer's total degrees are 150. So, 150 = Jolly's degrees + 5. Subtracting 5 from both sides, we get Jolly's degrees = 145. Since Summer has 150 degrees and Jolly has 145 degrees, the combined number of degrees they both have is 150 + 145 = 295. </think> <answer>295</answer>",
+    "ground_truth": "295"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Summer and Jolly both went to the same middle school. However, when they finished college, Summer had five more degrees than Jolly. If Summer has a total of 150 degrees, what's the combined number of degrees they both have?\nAssistant: <think>",
+    "response": " Since Summer has five more degrees than Jolly, and Summer has 150 degrees, Jolly must have 150 - 5 = 145 degrees. The combined number of degrees they both have is 150 + 145 = 295. </think> <answer>295</answer>",
+    "ground_truth": "295"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Summer and Jolly both went to the same middle school. However, when they finished college, Summer had five more degrees than Jolly. If Summer has a total of 150 degrees, what's the combined number of degrees they both have?\nAssistant: <think>",
+    "response": " Since Summer has five more degrees than Jolly, we can say that Jolly has 150 - 5 = 145 degrees. The total number of degrees they both have together is 150 + 145 = 295 degrees. </think> <answer>295</answer>",
+    "ground_truth": "295"
+  }
+]

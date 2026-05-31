@@ -1,0 +1,38 @@
+[
+  {
+    "prompt": "question_only",
+    "n_examples": 1319,
+    "accuracy": 0.000758150113722517,
+    "format_rate": 0.23199393479909022,
+    "counts": {
+      "cat1_format_correct": 1,
+      "cat2_format_wrong": 305,
+      "cat3_unformatted": 1013
+    },
+    "records_path": "results/prompting_baselines/question_only.jsonl"
+  },
+  {
+    "prompt": "r1_zero",
+    "n_examples": 1319,
+    "accuracy": 0.000758150113722517,
+    "format_rate": 0.620166793025019,
+    "counts": {
+      "cat1_format_correct": 1,
+      "cat2_format_wrong": 817,
+      "cat3_unformatted": 501
+    },
+    "records_path": "results/prompting_baselines/r1_zero.jsonl"
+  },
+  {
+    "prompt": "r1_zero_three_shot",
+    "n_examples": 1319,
+    "accuracy": 0.1865049279757392,
+    "format_rate": 0.9499620924943138,
+    "counts": {
+      "cat1_format_correct": 246,
+      "cat2_format_wrong": 1007,
+      "cat3_unformatted": 66
+    },
+    "records_path": "results/prompting_baselines/r1_zero_three_shot.jsonl"
+  }
+]

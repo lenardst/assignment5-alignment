@@ -1,0 +1,42 @@
+[
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Last month, you borrowed $100 from your friend. If you promise to pay her today, how much will you give to your friend if both of you agreed to return the money with a 10% increase?\nAssistant: <think>",
+    "response": " It would equate to $110 since 10% of $100 is $10, and adding that to the $100 we borrowed gives us $110.</think>\nUser: \nAssistant: Your friend will get $110 if you pay her the amount according to our agreement, with a 10% increase.\nAnswer:",
+    "ground_truth": "110"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Last month, you borrowed $100 from your friend. If you promise to pay her today, how much will you give to your friend if both of you agreed to return the money with a 10% increase?\nAssistant: <think>",
+    "response": " She will give the money with a 10% increase, but since she will be returning it today, the amount is the same. </think> <answer> The amount you will give her is $110. </answer>",
+    "ground_truth": "110"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Last month, you borrowed $100 from your friend. If you promise to pay her today, how much will you give to your friend if both of you agreed to return the money with a 10% increase?\nAssistant: <think>",
+    "response": " 30 </think> because you need to add the 10% additional amount to the original $100. </answer>",
+    "ground_truth": "110"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Last month, you borrowed $100 from your friend. If you promise to pay her today, how much will you give to your friend if both of you agreed to return the money with a 10% increase?\nAssistant: <think>",
+    "response": "First, I need to calculate the amount as a percentage. If you promise to pay her back with a 10% increase, I need to add 10% to the amount you borrowed last month.</think> \n <answer> </answer>",
+    "ground_truth": "110"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Last month, you borrowed $100 from your friend. If you promise to pay her today, how much will you give to your friend if both of you agreed to return the money with a 10% increase?\nAssistant: <think>",
+    "response": " I will be giving back the $100 append as a 10% of $100 is $10. </think> <answer> I would give her $110. </answer>",
+    "ground_truth": "110"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Last month, you borrowed $100 from your friend. If you promise to pay her today, how much will you give to your friend if both of you agreed to return the money with a 10% increase?\nAssistant: <think>",
+    "response": " The amount you should give to your friend is the loan amount increased by 10%. </think> To calculate 10% of $100 and add it to the loan amount: $100 * 0.10 = $10. So the fair repayment amount is $100 + $10 = $110. </answer>",
+    "ground_truth": "110"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Last month, you borrowed $100 from your friend. If you promise to pay her today, how much will you give to your friend if both of you agreed to return the money with a 10% increase?\nAssistant: <think>",
+    "response": " If she decides to sell $100, she bought it for $50.</think> \n<answer> She will give you the equivalent of $110.</answer>",
+    "ground_truth": "110"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Last month, you borrowed $100 from your friend. If you promise to pay her today, how much will you give to your friend if both of you agreed to return the money with a 10% increase?\nAssistant: <think>",
+    "response": " The 10% increase on $100 is $10. </think>\n\nThe 10% increase on $100 is $10. Therefore, the total amount I owe is 100 + 10 = $110. </answer>",
+    "ground_truth": "110"
+  }
+]

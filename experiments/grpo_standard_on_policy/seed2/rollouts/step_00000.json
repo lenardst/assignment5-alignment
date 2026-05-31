@@ -1,0 +1,42 @@
+[
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Youngsville had a population of 684 people.  The town had a growth spurt and the population increased by 25% then they witnessed that 40% of the population moved away.  What is the current population?\nAssistant: <think>",
+    "response": " The current population is 684 x 1.25 x (1 - 40 / 100) </think> <answer>The current population is 578 people mode</answer>",
+    "ground_truth": "513"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Youngsville had a population of 684 people.  The town had a growth spurt and the population increased by 25% then they witnessed that 40% of the population moved away.  What is the current population?\nAssistant: <think>",
+    "response": "First, let's calculate the population after the 25% increase. </think>\n<pocnt=0>\nNow, we need to find out what 25% of 684 is and subtract that from the original population to get the current population.</p>\n<pocnt=0>\nLet's do the calculation.\n<pocnt=0>\n<answer>\n684\n</answer>",
+    "ground_truth": "513"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Youngsville had a population of 684 people.  The town had a growth spurt and the population increased by 25% then they witnessed that 40% of the population moved away.  What is the current population?\nAssistant: <think>",
+    "response": " 684 * 1.25 = 846 </think>\n846 * 0.4 = 345.6\nthus, the current population is 3156 - 345.6 = 2780.4.</answer>",
+    "ground_truth": "513"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Youngsville had a population of 684 people.  The town had a growth spurt and the population increased by 25% then they witnessed that 40% of the population moved away.  What is the current population?\nAssistant: <think>",
+    "response": "First we need to find the population after it increased by 25%. So, we calculate 684 * 0.25 = 171 people added to the population. </think>\n<br><answer> The population after the growth increase is 684 + 171 = 855 people.\n<br><think>Now, 40% of this increased population moved away, so we calculate 855 * 40 / 100 = 342 people moved away.\n<br><answer> Defining the population as 'people' we have `people + people * 0.25` which gives us 857 people.\n<br><think>Then, 285 people moved away so 857 - 285 = 572 people are left.\n<br><answer> Therefore, current population is 572 people.\n</think> \n572",
+    "ground_truth": "513"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Youngsville had a population of 684 people.  The town had a growth spurt and the population increased by 25% then they witnessed that 40% of the population moved away.  What is the current population?\nAssistant: <think>",
+    "response": " <event>719 </event>Before the population increase, the town of Youngsville had 684 people.The population increased by 25% so the new population is 684 * 1.25 </think> <answer> 839 </answer>",
+    "ground_truth": "513"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Youngsville had a population of 684 people.  The town had a growth spurt and the population increased by 25% then they witnessed that 40% of the population moved away.  What is the current population?\nAssistant: <think>",
+    "response": " The current population is calculated by adding the growth spurt to the original population, then subtracting the percentage of people who moved away. </think> <answer> The current population is 684 + 684 % 40 = 684 + 270 = 1024, then we subtract the 40% who moved, which is 1024 - 360 = 644. The current population is 644. </answer>",
+    "ground_truth": "513"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Youngsville had a population of 684 people.  The town had a growth spurt and the population increased by 25% then they witnessed that 40% of the population moved away.  What is the current population?\nAssistant: <think>",
+    "response": "Population = 684 * 1.25 * 0.50</think> \n<answer> The treasuries have a capital preservation of 10%. The treasuries have a net, long-term reward ranging from 7% to 10%. Given a net long-term reward, the required capital remain will change. </answer>",
+    "ground_truth": "513"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Youngsville had a population of 684 people.  The town had a growth spurt and the population increased by 25% then they witnessed that 40% of the population moved away.  What is the current population?\nAssistant: <think>",
+    "response": " The population increased by 25%. So, the new population after the growth spurt would be 684 * 1.25. Then, 40% of the population 684 * .4 would have moved away. Let's calculate that.</answer>",
+    "ground_truth": "513"
+  }
+]

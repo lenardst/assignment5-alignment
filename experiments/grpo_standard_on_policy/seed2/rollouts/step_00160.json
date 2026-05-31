@@ -1,0 +1,42 @@
+[
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Clover goes for a 1.5-mile walk in the morning and another 1.5-mile walk in the evening, every day, how many miles does he walk in 30 days?\nAssistant: <think>",
+    "response": " Let's break it down. In one day, Clover walks 1.5 miles in the morning and 1.5 miles in the evening, which totals 3 miles per day. Over 30 days, he would walk 3 miles/day * 30 days = 90 miles. So, Clover walks 90 miles in 30 days. </think> <answer> 90 </answer>",
+    "ground_truth": "90"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Clover goes for a 1.5-mile walk in the morning and another 1.5-mile walk in the evening, every day, how many miles does he walk in 30 days?\nAssistant: <think>",
+    "response": " Let's break it down. In one day, Clover walks a total of 1.5 miles in the morning plus 1.5 miles in the evening, which is 2.0 miles per day. Over 30 days, he would walk 2.0 miles/day * 30 days = 60 miles. So, the total distance Clover walks in 30 days is 60 miles. </think> <answer> 60 </answer>",
+    "ground_truth": "90"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Clover goes for a 1.5-mile walk in the morning and another 1.5-mile walk in the evening, every day, how many miles does he walk in 30 days?\nAssistant: <think>",
+    "response": " Let's break it down. In one day, Clover walks a total of 1.5 miles in the morning and 1.5 miles in the evening, which adds up to 3 miles per day. Over 30 days, he would walk 3 miles/day * 30 days = 90 miles. So, the total distance Clover walks in 30 days is 90 miles. </think> <answer> 90 </answer>",
+    "ground_truth": "90"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Clover goes for a 1.5-mile walk in the morning and another 1.5-mile walk in the evening, every day, how many miles does he walk in 30 days?\nAssistant: <think>",
+    "response": " Let's break it down. In one day, Clover walks a total of 1.5 miles in the morning plus 1.5 miles in the evening, which sums up to 3 miles per day. Over 30 days, he would walk 3 miles/day * 30 days = 90 miles. So, the total distance Clover walks in 30 days is 90 miles. </think> <answer> 90 </answer>",
+    "ground_truth": "90"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Clover goes for a 1.5-mile walk in the morning and another 1.5-mile walk in the evening, every day, how many miles does he walk in 30 days?\nAssistant: <think>",
+    "response": " Let's break it down. In one day, Clover walks 1.5 miles in the morning and 1.5 miles in the evening, which totals 3 miles per day. Over 30 days, he would walk 3 miles/day * 30 days = 90 miles. So, Clover walks 90 miles in 30 days. </think> <answer> 90 </answer>",
+    "ground_truth": "90"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Clover goes for a 1.5-mile walk in the morning and another 1.5-mile walk in the evening, every day, how many miles does he walk in 30 days?\nAssistant: <think>",
+    "response": " Let's break it down. In one day, Clover walks a total of 1.5 miles in the morning plus 1.5 miles in the evening, which is 3 miles per day. Over 30 days, he would walk 3 miles/day * 30 days = 90 miles. So, the total distance Clover walks in 30 days is 90 miles. </think> <answer> 90 </answer>",
+    "ground_truth": "90"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Clover goes for a 1.5-mile walk in the morning and another 1.5-mile walk in the evening, every day, how many miles does he walk in 30 days?\nAssistant: <think>",
+    "response": " Let's break it down. In one day, Clover walks 1.5 miles in the morning and 1.5 miles in the evening, which totals 3 miles per day. Over 30 days, he would walk 3 miles/day * 30 days = 90 miles. So, Clover walks 90 miles in 30 days. </think> <answer> 90 </answer>",
+    "ground_truth": "90"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Clover goes for a 1.5-mile walk in the morning and another 1.5-mile walk in the evening, every day, how many miles does he walk in 30 days?\nAssistant: <think>",
+    "response": " Let's break it down. In one day, Clover walks a total of 1.5 miles in the morning and 1.5 miles in the evening, which adds up to 3 miles per day. Over 30 days, he would walk 3 miles/day * 30 days = 90 miles. So, the total distance Clover walks in 30 days is 90 miles. </think> <answer> 90 </answer>",
+    "ground_truth": "90"
+  }
+]

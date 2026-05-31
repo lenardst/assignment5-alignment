@@ -1,0 +1,42 @@
+[
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Oliver has 4 friends that he is inviting to a party at the arcade. Game tokens cost 30 for $1. Each game costs 2 tokens. If he wants all his friends to get to play 60 games each, how much will it cost?\nAssistant: <think>",
+    "response": "First, we need to find out how many games each friend will play. Since 60 tokens can be played by 30 friends, it means each friend will play 2 games. </think> <answer>240</answer>",
+    "ground_truth": "16"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Oliver has 4 friends that he is inviting to a party at the arcade. Game tokens cost 30 for $1. Each game costs 2 tokens. If he wants all his friends to get to play 60 games each, how much will it cost?\nAssistant: <think>",
+    "response": " logic. Since each token costs 2/60 = 1/30 of a dollar. So each token is $0.01. </think> <answer> 0.8 </answer>",
+    "ground_truth": "16"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Oliver has 4 friends that he is inviting to a party at the arcade. Game tokens cost 30 for $1. Each game costs 2 tokens. If he wants all his friends to get to play 60 games each, how much will it cost?\nAssistant: <think>",
+    "response": " He has $2 from each friend, so for 4 friends, that's $8 a total. Since the tokens cost 2 per game, $8 for 60 games is 4 strategy games. </think> <answer> 288 </answer>",
+    "ground_truth": "16"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Oliver has 4 friends that he is inviting to a party at the arcade. Game tokens cost 30 for $1. Each game costs 2 tokens. If he wants all his friends to get to play 60 games each, how much will it cost?\nAssistant: <think>",
+    "response": " 60 tokens * 30 tokens / game = 1800 tokens. </think> <answer> 1800</answer>",
+    "ground_truth": "16"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Oliver has 4 friends that he is inviting to a party at the arcade. Game tokens cost 30 for $1. Each game costs 2 tokens. If he wants all his friends to get to play 60 games each, how much will it cost?\nAssistant: <think>",
+    "response": " since each friend will need 60 games, 4 friends * 60 games = 240 tokens are needed. 240 tokens * $2/2 token = $120 is needed for all friends to play 60 games. </think> <answer> 120 </answer>",
+    "ground_truth": "16"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Oliver has 4 friends that he is inviting to a party at the arcade. Game tokens cost 30 for $1. Each game costs 2 tokens. If he wants all his friends to get to play 60 games each, how much will it cost?\nAssistant: <think>",
+    "response": " Each game costs 2 tokens in the arcade. Game tokens cost 30 for $1. </think> <answer> 360 </answer>",
+    "ground_truth": "16"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Oliver has 4 friends that he is inviting to a party at the arcade. Game tokens cost 30 for $1. Each game costs 2 tokens. If he wants all his friends to get to play 60 games each, how much will it cost?\nAssistant: <think>",
+    "response": " he wants to buy 4 friends tokens and each game is 2 tokens, so for each game they would need 4 * 2 = 8 tokens. </think> <answer> 4 * 8 = 32</answer>",
+    "ground_truth": "16"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Oliver has 4 friends that he is inviting to a party at the arcade. Game tokens cost 30 for $1. Each game costs 2 tokens. If he wants all his friends to get to play 60 games each, how much will it cost?\nAssistant: <think>",
+    "response": " Each friend will play 60 games, so 60 * 2 tokens per game = 120 tokens per friend. But since there are 4 friends, 120 tokens * 4 friends = 480 tokens in total, and 480 tokens / 2 tokens per dollar = 240 dollars in total. </think> <answer> 240 </answer>",
+    "ground_truth": "16"
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Jade earns $1600 per month and spent 75% of it on living expenses, one-fifth on insurance, and saves the rest, how much does she save per month?\nAssistant: <think>",
+    "response": " Living expenses amount to 75% of $1600, which is 0.75 * 1600 = $1200. One-fifth of her earnings go towards insurance, so that's 0.20 * 1600 = $320. To find out how much she saves, we subtract the living expenses and insurance from her total earnings: 1600 - 1200 - 320 = $400. So, Jade saves $400 per month. </think> <answer> 400 </answer>",
+    "ground_truth": "80"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Jade earns $1600 per month and spent 75% of it on living expenses, one-fifth on insurance, and saves the rest, how much does she save per month?\nAssistant: <think>",
+    "response": " First, let's calculate how much she spends on living expenses. That would be 75% of $16,000, which is 0.75 * 16000 = $12,000. Then, one-fifth of her earnings go towards insurance, so that's 1/5 * 16000 = $4,000. To find out how much she saves, we subtract the living expenses and insurance from her total earnings: 16000 - 12000 - 4000 = $4000. So, Jade saves $4000 per month. </think> <answer> 4000 </answer>",
+    "ground_truth": "80"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Jade earns $1600 per month and spent 75% of it on living expenses, one-fifth on insurance, and saves the rest, how much does she save per month?\nAssistant: <think>",
+    "response": " First, let's calculate how much she spends on living expenses. That would be 75% of $16,000, which is 0.75 * 16000 = $12,000. Then, one-fifth of her salary goes to insurance, which is 1/5 * 16000 = $4,000. To find out how much she saves, we subtract the living expenses and insurance from her total salary. So, $16,000 - $12,000 - $4,000 = $0. This means she saves $0 per month. </think> <answer> 0 </answer>",
+    "ground_truth": "80"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Jade earns $1600 per month and spent 75% of it on living expenses, one-fifth on insurance, and saves the rest, how much does she save per month?\nAssistant: <think>",
+    "response": " First, let's calculate how much Jade spends on living expenses. That would be 75% of $16,000, which is 0.75 * 16000 = $12,000. Then, one-fifth of her salary on insurance would be 1/5 * 16000 = $4,000. So, the total spent on living expenses and insurance is $12,000 + $4,000 = $16,000. Since her total salary is $16,000 and she spends $16,000 on living expenses and insurance, she saves the remaining amount, which is $16,000 - $16,000 = $0. So, Jade saves $0 per month. </think> <answer> 0 </answer>",
+    "ground_truth": "80"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Jade earns $1600 per month and spent 75% of it on living expenses, one-fifth on insurance, and saves the rest, how much does she save per month?\nAssistant: <think>",
+    "response": " First, let's calculate how much she spends on living expenses. That would be 75% of $16,00",
+    "ground_truth": "80"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Jade earns $1600 per month and spent 75% of it on living expenses, one-fifth on insurance, and saves the rest, how much does she save per month?\nAssistant: <think>",
+    "response": " Living expenses are 15% of $16,000, which is 0.15 * 16000 = $2400. Insurance is 1-5 = 0.5 of living expenses, so that's 0.5 * 2400 = $1200. The rest she saves is her income minus living expenses and insurance, which is 16000 - 2400 - 1200 = $12400. So, she saves $12400 per month. </think> <answer> 12400 </answer>",
+    "ground_truth": "80"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Jade earns $1600 per month and spent 75% of it on living expenses, one-fifth on insurance, and saves the rest, how much does she save per month?\nAssistant: <think>",
+    "response": " Living expenses are 75% of $16,000, which is 0.75 * 16000 = $12,000. One-fifth of her salary goes to insurance, so that's 0.2 * 16000 = $4,000. To find out how much she saves, we subtract her living expenses and insurance from her salary: 16000 - 12000 - 4000 = $2000. So, Jade saves $2000 per month. </think> <answer> 2000 </answer>",
+    "ground_truth": "80"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: If Jade earns $1600 per month and spent 75% of it on living expenses, one-fifth on insurance, and saves the rest, how much does she save per month?\nAssistant: <think>",
+    "response": " Living expenses are 75% of $16,00, which is 0.75 * 4000 = $3,000. One-fifth of her salary for insurance is 0.2 * 4000 = $800. So, the total spent on living expenses and insurance is 3000 + 800 = $3,800. Thus, the amount she saves per month is her salary minus living expenses and insurance, which is 4000 - 3800 = $200. </think> <answer> 200 </answer>",
+    "ground_truth": "80"
+  }
+]

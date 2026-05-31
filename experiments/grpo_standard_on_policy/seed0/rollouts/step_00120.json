@@ -1,0 +1,42 @@
+[
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: A chocolate cake needs 3 eggs per cake. Cheesecake requires 8 eggs for each cheesecake. How many more eggs are needed for 9 cheesecakes than are needed for 5 chocolate cakes?\nAssistant: <think>",
+    "response": " For 5 chocolate cakes, we need 5 * 3 = 15 eggs. For 9 cheesecakes, we need 9 * 8 = 72 eggs. The difference is 72 - 15 = 57 eggs. </think> <answer> 57 </answer>",
+    "ground_truth": "57"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: A chocolate cake needs 3 eggs per cake. Cheesecake requires 8 eggs for each cheesecake. How many more eggs are needed for 9 cheesecakes than are needed for 5 chocolate cakes?\nAssistant: <think>",
+    "response": " For 5 chocolate cakes, we need 5 * 3 = 15 eggs. For 9 cheesecakes, we need 9 * 8 = 72 eggs. The difference is 72 - 15 = 57 eggs. </think> <answer> 57 </answer>",
+    "ground_truth": "57"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: A chocolate cake needs 3 eggs per cake. Cheesecake requires 8 eggs for each cheesecake. How many more eggs are needed for 9 cheesecakes than are needed for 5 chocolate cakes?\nAssistant: <think>",
+    "response": " For 5 chocolate cakes, we need 5 * 3 = 15 eggs. For 9 cheesecakes, we need 9 * 8 = 72 eggs. So, we need 72 - 15 = 57 more eggs for 9 cheesecakes than for 5 chocolate cakes. </think> <answer> 57 </answer>",
+    "ground_truth": "57"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: A chocolate cake needs 3 eggs per cake. Cheesecake requires 8 eggs for each cheesecake. How many more eggs are needed for 9 cheesecakes than are needed for 5 chocolate cakes?\nAssistant: <think>",
+    "response": " For 5 chocolate cakes, we need 5 * 3 = 15 eggs. For 9 cheesecakes, we need 9 * 8 = 72 eggs. The difference in the number of eggs needed is 72 - 15 = 57 eggs. </think> <answer> 57 </answer>",
+    "ground_truth": "57"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: A chocolate cake needs 3 eggs per cake. Cheesecake requires 8 eggs for each cheesecake. How many more eggs are needed for 9 cheesecakes than are needed for 5 chocolate cakes?\nAssistant: <think>",
+    "response": " For 5 chocolate cakes, we need 5 * 3 = 15 eggs. For 9 cheesecakes, we need 9 * 8 = 72 eggs. So, we need 72 - 15 = 57 more eggs for 9 cheesecakes than for 5 chocolate cakes. </think> <answer> 57 </answer>",
+    "ground_truth": "57"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: A chocolate cake needs 3 eggs per cake. Cheesecake requires 8 eggs for each cheesecake. How many more eggs are needed for 9 cheesecakes than are needed for 5 chocolate cakes?\nAssistant: <think>",
+    "response": " For 5 chocolate cakes, since each cake needs 3 eggs, we need 5 * 3 = 15 eggs. For 9 cheesecakes, each requiring 8 eggs, we need 9 * 8 = 72 eggs. The difference is 72 - 15 = 57 eggs. </think> <answer> 57 </answer>",
+    "ground_truth": "57"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: A chocolate cake needs 3 eggs per cake. Cheesecake requires 8 eggs for each cheesecake. How many more eggs are needed for 9 cheesecakes than are needed for 5 chocolate cakes?\nAssistant: <think>",
+    "response": " For 5 chocolate cakes, we need 5 * 3 = 15 eggs. For 9 cheesecakes, we need 9 * 8 = 72 eggs. The difference is 72 - 15 = 57 eggs. </think> <answer> 57 </answer>",
+    "ground_truth": "57"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: A chocolate cake needs 3 eggs per cake. Cheesecake requires 8 eggs for each cheesecake. How many more eggs are needed for 9 cheesecakes than are needed for 5 chocolate cakes?\nAssistant: <think>",
+    "response": " For 5 chocolate cakes, we need 5 * 3 = 15 eggs. For 9 cheesecakes, we need 9 * 8 = 72 eggs. The difference is 72 - 15 = 57 eggs. </think> <answer> 57 </answer>",
+    "ground_truth": "57"
+  }
+]

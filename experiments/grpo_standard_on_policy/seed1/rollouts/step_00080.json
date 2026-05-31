@@ -1,0 +1,42 @@
+[
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Emberly takes her mornings walks every day. If each walk takes her 1 hour covering 4 miles, and she didn't walk for 4 days in March, calculate the total number of miles she's walked.\nAssistant: <think>",
+    "response": " Emberly walks 4 miles each day for 1 hour, so each day she walks 4 miles. She didn't walk for 4 days, so we need to calculate the total distance for 5 days. Therefore, the total distance is 4 miles/day * 5 days = 20 miles. </think> <answer> 20 </answer>",
+    "ground_truth": "108"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Emberly takes her mornings walks every day. If each walk takes her 1 hour covering 4 miles, and she didn't walk for 4 days in March, calculate the total number of miles she's walked.\nAssistant: <think>",
+    "response": " Since each walk takes 1 hour and covers 4 miles, in 4 days, she would have walked 4 days * 1 hour/day * 4 miles/hour = 16 miles. </think> <answer> 16 </answer>",
+    "ground_truth": "108"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Emberly takes her mornings walks every day. If each walk takes her 1 hour covering 4 miles, and she didn't walk for 4 days in March, calculate the total number of miles she's walked.\nAssistant: <think>",
+    "response": " Emberly takes a 1-hour walk each day, and since there are 7 days in a week, her daily walks amount to 7 hours. If she didn't walk for 4 days, that's 4 days * 7 hours/day = 28 hours of non-walking time. Adding the 9 hours of walking time for the 4 days in march when she normally walks, the total walking time is 28 + 9 = 37 hours. Since each walk covers 4 miles, the total number of miles walked is 37 hours * 4 miles/hour = 148 miles. </think> <answer> 148 </answer>",
+    "ground_truth": "108"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Emberly takes her mornings walks every day. If each walk takes her 1 hour covering 4 miles, and she didn't walk for 4 days in March, calculate the total number of miles she's walked.\nAssistant: <think>",
+    "response": " Since each walk takes 1 hour and covers 4 miles, in 1 day she walks 4 miles. If she didn't walk for 4 days in March, she would have walked 4 miles/day * 4 days = 16 miles. </think> <answer> 16 </answer>",
+    "ground_truth": "108"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Emberly takes her mornings walks every day. If each walk takes her 1 hour covering 4 miles, and she didn't walk for 4 days in March, calculate the total number of miles she's walked.\nAssistant: <think>",
+    "response": " Since each walk takes 1 hour and covers 4 miles, in 1 day she walks 4 miles. If she didn't walk for 4 days, she would have walked 4 days * 4 miles/day = 16 miles in March. </think> <answer> 16 </answer>",
+    "ground_truth": "108"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Emberly takes her mornings walks every day. If each walk takes her 1 hour covering 4 miles, and she didn't walk for 4 days in March, calculate the total number of miles she's walked.\nAssistant: <think>",
+    "response": " Since each walk takes 1 hour covering 4 miles and she didn't walk for 4 days, that means she walked for 31 - 4 = 27 days. So, the total number of miles she's walked is 4 miles/walk * 27 walks = 108 miles. </think> <answer> 108 </answer>",
+    "ground_truth": "108"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Emberly takes her mornings walks every day. If each walk takes her 1 hour covering 4 miles, and she didn't walk for 4 days in March, calculate the total number of miles she's walked.\nAssistant: <think>",
+    "response": " Since each walk takes 1 hour and covers 4 miles, in 4 days of not walking, she would have walked for 4 days * 1 hour/day = 4 hours. Given that each hour corresponds to 4 miles, in 4 hours, she would have walked 4 hours * 4 miles/hour = 16 miles. </think> <answer> 16 </answer>",
+    "ground_truth": "108"
+  },
+  {
+    "prompt": "A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.\nUser: Emberly takes her mornings walks every day. If each walk takes her 1 hour covering 4 miles, and she didn't walk for 4 days in March, calculate the total number of miles she's walked.\nAssistant: <think>",
+    "response": " Since each walk takes 1 hour covering 4 miles and she didn't walk for 4 days, we need to calculate the total number of walks. Over 30 days in March, if she didn't walk for 4 days, that leaves 26 days she walked. Each walk is 1 hour, so 26 walks would be 26 hours. Since each walk covers 4 miles, 26 hours would cover 26 * 4 = 104 miles. </think> <answer> 104 </answer>",
+    "ground_truth": "108"
+  }
+]
