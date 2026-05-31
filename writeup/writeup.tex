@@ -101,21 +101,24 @@ for \texttt{question\_only} (expects a final answer in \verb|\boxed{}|) and
 \texttt{</think>~<answer>~\ldots~</answer>} format). Every generation is
 bucketed into one of three categories: Cat.~1 (format reward $=1$, answer
 reward $=1$), Cat.~2 (format reward $=1$, answer reward $=0$), or Cat.~3
-(format reward $=0$). Results are written to
+(format reward $=0$, answer reward $=0$). A format reward of $0$ forces an
+answer reward of $0$, since the answer cannot be parsed. Results are written to
 \texttt{experiments/prompting\_baselines/}.
 
 \begin{table}[H]
 \centering
 \begin{tabular}{lcccc}
 \toprule
-Prompt & Cat. 1 (fmt+ans) & Cat. 2 (fmt only) & Cat. 3 (no fmt) & Accuracy \\
+Prompt & Cat. 1 & Cat. 2 & Cat. 3 & Accuracy \\
 \midrule
 \texttt{question\_only}        & 1   & 305 & 1013 & 0.08\% \\
 \texttt{r1\_zero}              & 1   & 817 &  501 & 0.08\% \\
 \texttt{r1\_zero\_three\_shot} & 246 & 1007 &  66 & 18.65\% \\
 \bottomrule
 \end{tabular}
-\caption{GSM8K prompting results for OLMo-2-0425-1B ($n=1{,}319$, temperature 1.0, seed 0).}
+\caption{GSM8K prompting results for OLMo-2-0425-1B ($n=1{,}319$, temperature 1.0, seed 0).
+Cat.~1: format reward $1$, answer reward $1$. Cat.~2: format reward $1$, answer reward $0$.
+Cat.~3: format reward $0$, answer reward $0$.}
 \end{table}
 
 \paragraph{Manual audit of Category 2.}
