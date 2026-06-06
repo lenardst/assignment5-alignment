@@ -80,10 +80,13 @@ def parse_gsm8k_response(model_output: str) -> str | None:
 
 
 def compute_per_instance_dpo_loss(lm, lm_ref, tokenizer, beta, prompt, response_chosen, response_rejected) -> Tensor:
+    instruction_prefix = _ALPACA_TEMPLATE.split("{response}")[0].format(prompt=prompt)
+
     def sequence_log_prob(model, response):
-        batch = tokenize_prompt_and_output([prompt], [response], tokenizer)
+        response_with_eos = response + tokenizer.eos_token
+        batch = tokenize_prompt_and_output([instruction_prefix], [response_with_eos], tokenizer)
         log_probs = get_response_log_probs(model, batch["input_ids"], batch["labels"])["log_probs"]
-        return (log_probs * batch["response_mask"]).sum()
+        return (log_probs * batch["response_mask"].float()).sum()
 
     chosen_log_prob = sequence_log_prob(lm, response_chosen)
     rejected_log_prob = sequence_log_prob(lm, response_rejected)

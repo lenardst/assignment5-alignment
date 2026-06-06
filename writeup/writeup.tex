@@ -36,32 +36,6 @@
   stringstyle=\color{purple!70!black}
 }
 
-% ---------- Problem environment ----------
-\definecolor{problemshade}{rgb}{1.0,0.96,0.90}
-\newenvironment{problembox}[1]{%
-  \par\vspace{0.5em}%
-  \noindent\colorbox{problemshade}{%
-    \begin{minipage}{\dimexpr\linewidth-2\fboxsep}%
-      \textbf{Problem (\texttt{#1})}%
-    \end{minipage}%
-  }\par\nopagebreak\vspace{-0.2em}%
-  \noindent\rule{\linewidth}{0.4pt}\par\vspace{0.3em}%
-}{\par\vspace{0.5em}}
-
-\newcommand{\deliverable}[1]{\par\medskip\noindent\textbf{Deliverable:} #1\par\medskip}
-\newcommand{\todo}[1]{{\color{red}\textbf{[TODO: #1]}}}
-\newcommand{\placeholder}[1]{%
-  \begin{quote}\itshape\color{gray}#1\end{quote}%
-}
-
-% Image placeholder -- a framed grey box.
-% Usage: \plotplaceholder{width-fraction}{caption text}
-\newcommand{\plotplaceholder}[2]{%
-  \fbox{\begin{minipage}[c][1.4in][c]{\dimexpr #1\linewidth - 2\fboxsep\relax}%
-    \centering\color{gray}\itshape [Plot placeholder: #2]%
-  \end{minipage}}%
-}
-
 % ---------- Math shortcuts ----------
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\R}{\mathbb{R}}
@@ -70,6 +44,8 @@
 \newcommand{\policy}{\pi_\theta}
 \newcommand{\policyold}{\pi_{\theta_0}}
 \newcommand{\given}{\,|\,}
+
+\newcommand{\problemid}[1]{\subsection*{\texttt{#1}}}
 
 \title{CS336 Assignment 5: Reasoning RL \\ \large Writeup}
 \author{Lenard Strahringer}
@@ -85,9 +61,7 @@
 \section{Prompting}
 % =====================================================
 
-\begin{problembox}{prompting\_baselines}
-Run OLMo-2-0425-1B on GSM8K (5 points).
-\end{problembox}
+\problemid{prompting_baselines}
 
 \subsection*{(a) Evaluation script and metrics}
 
@@ -208,9 +182,7 @@ fixes format; the remaining errors are arithmetic.
 
 \subsection{Deriving on-policy GRPO}
 
-\begin{problembox}{baseline\_calcs}
-Compute the variance of the policy gradient estimator (5 points).
-\end{problembox}
+\problemid{baseline_calcs}
 
 Setup: $\policy(A=1) = p = \sigma(\theta)$, $r(A) = \mathbf{1}\{A=1\}$.
 
@@ -222,7 +194,6 @@ Setup: $\policy(A=1) = p = \sigma(\theta)$, $r(A) = \mathbf{1}\{A=1\}$.
 \]
 
 \subsection*{(a) Variance of the unadjusted estimator}
-\deliverable{An expression in terms of $n$ and $p$, accompanied by a derivation.}
 
 Let $Z_i = r(A_i)\nabla_\theta \log \policy(A_i)$. With $r(A)=\mathbf{1}\{A=1\}$:
 \[
@@ -242,7 +213,6 @@ The samples are i.i.d., so
 \]
 
 \subsection*{(b) Variance of the baseline-adjusted estimator}
-\deliverable{An expression in terms of $n$, $b$, and $p$, accompanied by a derivation and some discussion.}
 
 Let $Z_i = (r(A_i)-b)\nabla_\theta \log \policy(A_i)$. Then
 \[
@@ -289,59 +259,31 @@ population-mean baseline is sometimes better and sometimes worse, depending on $
 % -----------------------------------------------------
 \subsection{Implementing on-policy GRPO}
 
-\begin{problembox}{tokenize\_prompt\_and\_output}
-Prompt and output tokenization (1 point).
-\end{problembox}
-\deliverable{Implement \texttt{tokenize\_prompt\_and\_output}.}
-Implemented in \texttt{tests/adapters.py}. Test passes.
+\problemid{tokenize_prompt_and_output}
+Implemented in \texttt{tests/adapters.py}.
 
-\begin{problembox}{get\_response\_log\_probs}
-Response log-probs (and entropy) (1 point).
-\end{problembox}
-\deliverable{Implement \texttt{get\_response\_log\_probs}.}
-Implemented in \texttt{tests/adapters.py}. Test passes.
+\problemid{get_response_log_probs}
+Implemented in \texttt{tests/adapters.py}.
 
-\begin{problembox}{compute\_rollout\_rewards}
-Computing the rewards of rollouts (1 point).
-\end{problembox}
-\deliverable{Implement \texttt{compute\_rollout\_rewards}.}
-Implemented in \texttt{tests/adapters.py}. Test passes.
+\problemid{compute_rollout_rewards}
+Implemented in \texttt{tests/adapters.py}.
 
-\begin{problembox}{compute\_group\_normalized\_rewards\_grpo}
-Group normalization (1 point).
-\end{problembox}
-\deliverable{Implement \texttt{compute\_group\_normalized\_rewards} with
-\texttt{baseline="mean"}, \texttt{advantage\_normalizer="std"}.}
-Implemented in \texttt{tests/adapters.py}. Test passes.
+\problemid{compute_group_normalized_rewards_grpo}
+Implemented in \texttt{tests/adapters.py} with \texttt{baseline="mean"} and \texttt{advantage\_normalizer="std"}.
 
-\begin{problembox}{compute\_policy\_gradient\_loss\_on\_policy}
-On-policy policy gradient (1 point).
-\end{problembox}
-\deliverable{Implement \texttt{compute\_policy\_gradient\_loss} with
-\texttt{importance\_reweighting\_method = "none"}.}
-Implemented in \texttt{tests/adapters.py}. Test passes.
+\problemid{compute_policy_gradient_loss_on_policy}
+Implemented in \texttt{tests/adapters.py} with \texttt{importance\_reweighting\_method="none"}.
 
-\begin{problembox}{aggregate\_loss\_across\_microbatch\_sequence}
-Aggregate loss across tokens and sequences (0.5 points).
-\end{problembox}
-\deliverable{Implement \texttt{aggregate\_loss\_across\_microbatch} with \texttt{loss\_normalization = "sequence"}.}
-Implemented in \texttt{tests/adapters.py}. Test passes.
+\problemid{aggregate_loss_across_microbatch_sequence}
+Implemented in \texttt{tests/adapters.py} with \texttt{loss\_normalization="sequence"}.
 
-\begin{problembox}{grpo\_train\_step\_standard\_on\_policy}
-GRPO train step (5 points).
-\end{problembox}
-\deliverable{Implement \texttt{grpo\_train\_step} for the standard on-policy GRPO setting.}
-Implemented in \texttt{tests/adapters.py}. Test passes.
+\problemid{grpo_train_step_standard_on_policy}
+Implemented in \texttt{tests/adapters.py} for the standard on-policy setting.
 
 % -----------------------------------------------------
-\subsection{Experiments}
-
-\begin{problembox}{grpo\_experiments\_standard\_on\_policy}
-Use GRPO to improve OLMo-2-0425-1B performance on GSM8K (10 points).
-\end{problembox}
+\problemid{grpo_experiments_standard_on_policy}
 
 \subsection*{(a) Training script}
-\deliverable{A script to run GRPO (standard, on-policy) on GSM8K and OLMo-2-0425-1B.}
 
 The script is \texttt{scripts/grpo.py}. It takes CLI flags for the model,
 prompt style, data paths, group size, batch sizes, gradient accumulation steps,
@@ -364,11 +306,10 @@ importance-reweighting method. The main loop is:
 \end{enumerate}
 
 \subsection*{(b) Sanity check ($\sim$50 steps)}
-\deliverable{Evidence that convinced you the script is correct.}
 
 The full 200-step runs served as the sanity check. Three signals confirmed
 correctness. First, all four seeds reached val reward $>42\%$ by the end of
-training. This is well above the $25\%$ target. A broken loop would stay near
+training. A broken loop would stay near
 the baseline of $\sim$8\%. Second, rollout logging showed format adoption
 within the first 40 steps. By step~40, most completions follow the
 \texttt{</think>~<answer>~\ldots~</answer>} template; at step~0, they do not.
@@ -376,8 +317,6 @@ Third, val format reward climbed alongside total reward. This confirms the
 reward function and generation pipeline are connected correctly.
 
 \subsection*{(c) Full run with 4 seeds (r1\_zero, suggested hyperparameters)}
-\deliverable{Plots per metric, qualitative rollout examples, and a procedure
-that reaches $\geq 25\%$ final validation accuracy.}
 
 Four seeds were run for 200 rollout steps with the suggested hyperparameters
 (\texttt{lr=1e-5}, \texttt{group\_size=8}, \texttt{rollout\_batch\_size=256},
@@ -494,14 +433,11 @@ Mean & \textbf{0.445} & 0.881 \\
 \bottomrule
 \end{tabular}
 \end{center}
-All four seeds exceed the $\geq 25\%$ threshold. Mean final val reward is
+Mean final val reward is
 $44.5\%$ (std $1.7\%$).
 
 % --------------------------
-\begin{problembox}{grpo\_learning\_rate}
-Tune the learning rate (3 points).
-\end{problembox}
-\deliverable{Plot of final validation reward vs.\ learning rate, with a few sentences of commentary.}
+\problemid{grpo_learning_rate}
 
 A sweep over $\{3\!\times\!10^{-6}, 1\!\times\!10^{-5}, 3\!\times\!10^{-5}\}$
 was run with 2 seeds each. All other hyperparameters were fixed to the standard
@@ -522,10 +458,7 @@ $\text{lr}=3\!\times\!10^{-6}$ is stable but slow, reaching only $0.131$ after
 200 steps. $10^{-5}$ sits between too slow and too aggressive.
 
 % --------------------------
-\begin{problembox}{grpo\_prompt\_ablation}
-Prompt ablation (3 points).
-\end{problembox}
-\deliverable{Commentary, supported by plots for referenced metrics.}
+\problemid{grpo_prompt_ablation}
 
 Three prompts were tested: \texttt{question\_only}, \texttt{r1\_zero}, and
 \texttt{r1\_zero\_three\_shot}. Each was run with 2 seeds at \texttt{lr=1e-5}
@@ -567,10 +500,7 @@ deviation. It is not significant at 2 seeds.
 
 \subsection{Dr.\ GRPO}
 
-\begin{problembox}{think\_about\_length\_normalization}
-Think about length normalization (1 point).
-\end{problembox}
-\deliverable{A few sentences of discussion.}
+\problemid{think_about_length_normalization}
 
 Per-sequence normalization divides each sequence's total token loss by its
 length. A token in a long sequence gets a smaller weight than a token in a
@@ -585,25 +515,16 @@ token count in the batch. Use per-sequence normalization when response lengths
 vary a lot and stable updates matter. Use constant normalization when an
 unbiased gradient estimate matters more.
 
-\begin{problembox}{compute\_group\_normalized\_rewards\_drgrpo}
-Dr.\ GRPO group normalization (0.5 points).
-\end{problembox}
-\deliverable{Update \texttt{compute\_group\_normalized\_rewards} to support \texttt{advantage\_normalizer = "none"} and \texttt{baseline = "none"}.}
-Implemented in \texttt{tests/adapters.py}. Test passes.
+\problemid{compute_group_normalized_rewards_drgrpo}
+Implemented in \texttt{tests/adapters.py} with \texttt{advantage\_normalizer="none"} and \texttt{baseline="none"}.
 
-\begin{problembox}{aggregate\_loss\_across\_microbatch\_constant}
-Dr.\ GRPO loss aggregation (0.5 points).
-\end{problembox}
-\deliverable{Update \texttt{aggregate\_loss\_across\_microbatch} to support \texttt{loss\_normalization = "constant"}.}
-Implemented in \texttt{tests/adapters.py}. Test passes.
+\problemid{aggregate_loss_across_microbatch_constant}
+Implemented in \texttt{tests/adapters.py} with \texttt{loss\_normalization="constant"}.
 
 % --------------------------
 \subsection{Rejection fine tuning}
 
-\begin{problembox}{think\_about\_rft}
-Think about RFT (2 points).
-\end{problembox}
-\deliverable{A few sentences of discussion.}
+\problemid{think_about_rft}
 
 For binary reward, both objectives target the same gradient $\nabla\eta(x)$,
 but not exactly at finite $G$. RFT keeps a $\nabla\log\policy$ term on correct
@@ -623,9 +544,7 @@ the correct rollouts and is simpler.
 % --------------------------
 \subsection{MaxRL}
 
-\begin{problembox}{derive\_difficulty\_reweightings}
-Derive difficulty reweightings induced by different advantage normalizers (6 points).
-\end{problembox}
+\problemid{derive_difficulty_reweightings}
 
 \paragraph{Setup.} Write $\eta(x) = \E_{y\sim\policy}[r(y|x)]$. The standard
 policy gradient is $\nabla_\theta J_\theta = \E_x[\nabla\eta(x)]$. The surrogate
@@ -635,7 +554,6 @@ $\E_y[\nabla\log\policy(y|x)] = 0$. For any $f(x)$ independent of $y$, this
 gives $\E_y[f(x)\nabla\log\policy(y|x)] = 0$.
 
 \subsection*{(a) Dr.\ GRPO reweighting}
-\deliverable{An expression in terms of a subset of the problem parameters, with a few sentences of justification.}
 
 With $Z=G$ and $G\to\infty$:
 \[
@@ -651,7 +569,6 @@ Dr.\ GRPO weights all prompts equally. It matches the unbiased policy gradient
 in the on-policy limit.
 
 \subsection*{(b) GRPO (with std normalization) reweighting}
-\deliverable{An expression with derivation.}
 
 The estimator divides by the group std. For binary reward,
 \[
@@ -667,7 +584,6 @@ The weight is large at $\eta\approx 0$ and $\eta\approx 1$ and small at
 $\eta=1/2$. GRPO upweights very easy and very hard prompts.
 
 \subsection*{(c) MaxRL reweighting (divide by group mean)}
-\deliverable{An expression with derivation.}
 
 The estimator divides by $\mu$. With $G\to\infty$, $\mu \to \eta(x)$. So
 \[
@@ -678,10 +594,7 @@ The estimator divides by $\mu$. With $G\to\infty$, $\mu \to \eta(x)$. So
 The weight is large for hard prompts (small $\eta$) and small for easy prompts.
 MaxRL upweights hard prompts.
 
-\begin{problembox}{think\_about\_advantage\_normalization}
-Think about advantage normalization (2 points).
-\end{problembox}
-\deliverable{A few sentences of discussion.}
+\problemid{think_about_advantage_normalization}
 
 The three options balance stability and bias. Std normalization keeps the
 gradient norm roughly equal across groups. This stabilizes training. It also
@@ -693,25 +606,14 @@ then varies a lot across groups. Use std when training is unstable. Use mean
 when the data has many easy prompts and you want to focus on hard ones. Use
 none when you want an unbiased estimate.
 
-\begin{problembox}{compute\_group\_normalized\_rewards\_maxrl}
-MaxRL group normalization (0.5 points).
-\end{problembox}
-\deliverable{Update \texttt{compute\_group\_normalized\_rewards} to support \texttt{advantage\_normalizer = "mean"}.}
-Implemented in \texttt{tests/adapters.py}. Test passes.
+\problemid{compute_group_normalized_rewards_maxrl}
+Implemented in \texttt{tests/adapters.py} with \texttt{advantage\_normalizer="mean"}.
 
 % --------------------------
-\subsection{Experiments}
+\problemid{grpo_train_step_variants_on_policy}
+Implemented in \texttt{tests/adapters.py} for the full range of on-policy variants.
 
-\begin{problembox}{grpo\_train\_step\_variants\_on\_policy}
-GRPO train step variants (2.5 points).
-\end{problembox}
-\deliverable{Update \texttt{grpo\_train\_step} to support the full range of on-policy variants.}
-Implemented in \texttt{tests/adapters.py}. Tests pass for all four variants.
-
-\begin{problembox}{grpo\_experiments\_variants\_on\_policy}
-Compare the performance of different RL algorithms (10 points).
-\end{problembox}
-\deliverable{Commentary, supported by plots for referenced metrics.}
+\problemid{grpo_experiments_variants_on_policy}
 
 Four variants were run with 4 seeds each, the zero-shot \texttt{r1\_zero}
 prompt, and \texttt{loss\_norm=constant}:
@@ -755,10 +657,7 @@ $0.42$--$0.45$ and that RFT is consistently a little lower.
 
 \subsection{Importance reweighting / clipping}
 
-\begin{problembox}{derive\_surrogate\_objectives}
-Derive surrogate objectives for importance reweighting approaches (2 points).
-\end{problembox}
-\deliverable{An expression in terms of a subset of the problem parameters, accompanied by a derivation.}
+\problemid{derive_surrogate_objectives}
 
 \paragraph{Setup.} The pairwise estimator groups tokens into pairs
 $(y_{2t-1}, y_{2t})$. For each pair index $t \in \{1, \dots, L/2\}$ define a
@@ -795,31 +694,17 @@ surrogate above is therefore the objective for this estimator.
 % --------------------------
 \subsection{Implementation}
 
-\begin{problembox}{compute\_policy\_gradient\_loss\_off\_policy}
-Off-policy policy gradient with token-level reweighting (1 point).
-\end{problembox}
-\deliverable{Update \texttt{compute\_policy\_gradient\_loss} to support \texttt{importance\_reweighting\_method = "noclip"} or \texttt{"grpo"}.}
-Implemented in \texttt{tests/adapters.py}. Tests pass for both \texttt{noclip} and \texttt{grpo}.
+\problemid{compute_policy_gradient_loss_off_policy}
+Implemented in \texttt{tests/adapters.py} with \texttt{importance\_reweighting\_method} set to \texttt{noclip} or \texttt{grpo}.
 
-\begin{problembox}{compute\_policy\_gradient\_loss\_off\_policy\_gspo}
-Off-policy policy gradient with sequence-level reweighting (1 point).
-\end{problembox}
-\deliverable{Update \texttt{compute\_policy\_gradient\_loss} to support \texttt{importance\_reweighting\_method = "gspo"}.}
-Implemented in \texttt{tests/adapters.py}. Test passes. The geometric mean is computed in log space for numerical stability.
+\problemid{compute_policy_gradient_loss_off_policy_gspo}
+Implemented in \texttt{tests/adapters.py} with \texttt{importance\_reweighting\_method="gspo"}. The geometric mean is computed in log space for numerical stability.
 
-\begin{problembox}{grpo\_train\_step\_off\_policy}
-Off-policy GRPO train step (2.5 points).
-\end{problembox}
-\deliverable{Update \texttt{grpo\_train\_step} to support off-policy arguments.}
-Implemented in \texttt{tests/adapters.py}. Tests pass for \texttt{noclip}, \texttt{grpo}, and \texttt{gspo}.
+\problemid{grpo_train_step_off_policy}
+Implemented in \texttt{tests/adapters.py} with off-policy arguments.
 
 % --------------------------
-\subsection{Experiments}
-
-\begin{problembox}{grpo\_experiments\_off\_policy}
-Compare the performance of different off-policy algorithms (10 points).
-\end{problembox}
-\deliverable{Commentary, supported by plots for referenced metrics.}
+\problemid{grpo_experiments_off_policy}
 
 Four off-policy variants were run with 4 seeds each and \texttt{r1\_zero}.
 The runs use \texttt{rollout\_batch\_size=256}, \texttt{train\_batch\_size=8},
@@ -894,10 +779,7 @@ The GSPO result is robust given its low seed variance. The failure of
 \texttt{naive} is clear. The \texttt{clip} ranking is less certain because of
 its high seed-to-seed variance. Its exact mean should be read with caution.
 
-\begin{problembox}{think\_about\_importance\_reweighting}
-Think about importance reweighting (2 points).
-\end{problembox}
-\deliverable{A few sentences of commentary.}
+\problemid{think_about_importance_reweighting}
 
 No reweighting has the highest bias and the lowest variance. It works when
 $\policy$ and $\policyold$ are close. It breaks down once they drift apart.
@@ -911,12 +793,8 @@ GSPO for long sequences.
 
 % =====================================================
 \section{Try your own policy gradient estimator}
-% =====================================================
 
-\begin{problembox}{try\_your\_own}
-Try your own policy gradient estimator (10 points).
-\end{problembox}
-\deliverable{Commentary, plots, and optionally mathematical derivations.}
+\problemid{try_your_own}
 
 \subsection*{Proposed estimator: leave-one-out baseline (LOO-GRPO)}
 

@@ -1,37 +1,34 @@
 \contentsline {section}{\numberline {1}Prompting}{2}{section.1}%
-\contentsline {paragraph}{Manual audit of Category 2.}{2}{section*.4}%
-\contentsline {paragraph}{Manual audit of Category 3.}{2}{section*.5}%
-\contentsline {paragraph}{Example prompts and responses.}{2}{section*.6}%
-\contentsline {subparagraph}{\texttt {question\_only} (Cat.~3 --- typical failure).}{3}{section*.7}%
-\contentsline {subparagraph}{\texttt {r1\_zero} (Cat.~2 --- format correct, wrong answer).}{3}{section*.8}%
-\contentsline {subparagraph}{\texttt {r1\_zero\_three\_shot} (Cat.~1).}{3}{section*.9}%
-\contentsline {paragraph}{\texttt {question\_only}.}{3}{section*.11}%
-\contentsline {paragraph}{\texttt {r1\_zero}.}{3}{section*.12}%
-\contentsline {paragraph}{\texttt {r1\_zero\_three\_shot}.}{3}{section*.13}%
+\contentsline {paragraph}{Manual audit of Category 2.}{2}{section*.5}%
+\contentsline {paragraph}{Manual audit of Category 3.}{2}{section*.6}%
+\contentsline {paragraph}{Example prompts and responses.}{2}{section*.7}%
+\contentsline {subparagraph}{\texttt {question\_only} (Cat.~3 --- typical failure).}{3}{section*.8}%
+\contentsline {subparagraph}{\texttt {r1\_zero} (Cat.~2 --- format correct, wrong answer).}{3}{section*.9}%
+\contentsline {subparagraph}{\texttt {r1\_zero\_three\_shot} (Cat.~1).}{3}{section*.10}%
+\contentsline {paragraph}{\texttt {question\_only}.}{3}{section*.12}%
+\contentsline {paragraph}{\texttt {r1\_zero}.}{3}{section*.13}%
+\contentsline {paragraph}{\texttt {r1\_zero\_three\_shot}.}{3}{section*.14}%
 \contentsline {section}{\numberline {2}Group Relative Policy Optimization}{3}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Deriving on-policy GRPO}{3}{subsection.2.1}%
-\contentsline {paragraph}{Useful identities.}{4}{section*.14}%
+\contentsline {paragraph}{Useful identities.}{4}{section*.16}%
 \contentsline {subsection}{\numberline {2.2}Implementing on-policy GRPO}{5}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Experiments}{6}{subsection.2.3}%
-\contentsline {paragraph}{Per-metric behavior.}{7}{section*.22}%
-\contentsline {paragraph}{Rollout examples (before vs.\ after training).}{8}{section*.24}%
-\contentsline {subparagraph}{Step~0 (before training).}{8}{section*.25}%
-\contentsline {subparagraph}{Step~160 (after training).}{9}{section*.26}%
-\contentsline {paragraph}{Final accuracy.}{9}{section*.27}%
-\contentsline {section}{\numberline {3}RL Algorithm Variants}{11}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Dr.\ GRPO}{11}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Rejection fine tuning}{12}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}MaxRL}{12}{subsection.3.3}%
-\contentsline {paragraph}{Setup.}{13}{section*.30}%
-\contentsline {subsection}{\numberline {3.4}Experiments}{14}{subsection.3.4}%
-\contentsline {paragraph}{Discussion.}{15}{section*.35}%
-\contentsline {section}{\numberline {4}Off-policy RL}{15}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Importance reweighting / clipping}{15}{subsection.4.1}%
-\contentsline {paragraph}{Setup.}{16}{section*.36}%
-\contentsline {paragraph}{Surrogate.}{16}{section*.37}%
-\contentsline {paragraph}{Derivation.}{16}{section*.38}%
-\contentsline {subsection}{\numberline {4.2}Implementation}{16}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Experiments}{17}{subsection.4.3}%
-\contentsline {paragraph}{Discussion.}{17}{section*.40}%
-\contentsline {section}{\numberline {5}Try your own policy gradient estimator}{18}{section.5}%
-\contentsline {paragraph}{Does it beat the baselines?}{19}{section*.45}%
+\contentsline {paragraph}{Per-metric behavior.}{7}{section*.32}%
+\contentsline {paragraph}{Rollout examples (before vs.\ after training).}{8}{section*.34}%
+\contentsline {subparagraph}{Step~0 (before training).}{8}{section*.35}%
+\contentsline {subparagraph}{Step~160 (after training).}{8}{section*.36}%
+\contentsline {paragraph}{Final accuracy.}{9}{section*.37}%
+\contentsline {section}{\numberline {3}RL Algorithm Variants}{10}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Dr.\ GRPO}{10}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Rejection fine tuning}{11}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}MaxRL}{11}{subsection.3.3}%
+\contentsline {paragraph}{Setup.}{11}{section*.47}%
+\contentsline {paragraph}{Discussion.}{13}{section*.56}%
+\contentsline {section}{\numberline {4}Off-policy RL}{13}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Importance reweighting / clipping}{13}{subsection.4.1}%
+\contentsline {paragraph}{Setup.}{13}{section*.58}%
+\contentsline {paragraph}{Surrogate.}{14}{section*.59}%
+\contentsline {paragraph}{Derivation.}{14}{section*.60}%
+\contentsline {subsection}{\numberline {4.2}Implementation}{14}{subsection.4.2}%
+\contentsline {paragraph}{Discussion.}{15}{section*.66}%
+\contentsline {section}{\numberline {5}Try your own policy gradient estimator}{16}{section.5}%
+\contentsline {paragraph}{Does it beat the baselines?}{17}{section*.73}%
