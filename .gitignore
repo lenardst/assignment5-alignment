@@ -2,6 +2,13 @@
 models/
 data/
 
+# Submission and test artifacts
+code.zip
+test_results.xml
+
+# Model checkpoints (weights too large for git)
+*.safetensors
+
 nav
 tags
 
