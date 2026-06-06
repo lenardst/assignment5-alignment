@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1780740267.37765 "writeup.tex" "writeup.pdf" "writeup" 1780740268.73321 2
+["pdflatex"] 1780740576.3627 "writeup.tex" "writeup.pdf" "writeup" 1780740577.88575 0
   "../experiments/writeup/plots/loo_grpo_reward.png" 1780336388.14535 27568 22b79adc0853cd956c3ecfb4ba3c5e59 ""
   "../experiments/writeup/plots/lr_sweep_reward.png" 1780336387.84942 21722 54f77244de01f79e58e0bf28682dab6f ""
   "../experiments/writeup/plots/off_policy_reward.png" 1780336388.09782 31410 844bc80712137d6944b094f5d5e3f03c ""
@@ -149,10 +149,10 @@
   "/usr/local/texlive/2026basic/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1776918026 79187 e3f5941707347d15c1721f52279213a2 ""
   "/usr/local/texlive/2026basic/texmf-var/web2c/pdftex/pdflatex.fmt" 1776918010 2966192 ef19d24f7f810393873db89cc363a167 ""
   "/usr/local/texlive/2026basic/texmf.cnf" 1772405582 628 bbc09d6d38872d53c11bb48dc9b14e88 ""
-  "writeup.aux" 1780740268.5649 7244 5998019942ac5138991c7d46251c35c5 "pdflatex"
-  "writeup.out" 1780740268.56673 1910 87daa4c65ff52caa2273c2fe087fd47b "pdflatex"
-  "writeup.tex" 1780740264.95179 39108 a5f1adbf943ce3708196b2cb2eb550dd ""
-  "writeup.toc" 1780740268.56703 2552 453e6b58f5119eecc3b88aab7eb88da6 "pdflatex"
+  "writeup.aux" 1780740577.75519 7244 5998019942ac5138991c7d46251c35c5 "pdflatex"
+  "writeup.out" 1780740577.75702 1910 87daa4c65ff52caa2273c2fe087fd47b "pdflatex"
+  "writeup.tex" 1780740575.66495 39111 f01964e65bf4165cf02a3c78725f1333 ""
+  "writeup.toc" 1780740577.75735 2552 453e6b58f5119eecc3b88aab7eb88da6 "pdflatex"
   (generated)
   "writeup.aux"
   "writeup.log"
