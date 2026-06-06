@@ -54,7 +54,7 @@
   \begin{quote}\itshape\color{gray}#1\end{quote}%
 }
 
-% Image placeholder — a framed grey box.
+% Image placeholder -- a framed grey box.
 % Usage: \plotplaceholder{width-fraction}{caption text}
 \newcommand{\plotplaceholder}[2]{%
   \fbox{\begin{minipage}[c][1.4in][c]{\dimexpr #1\linewidth - 2\fboxsep\relax}%
@@ -91,19 +91,13 @@ Run OLMo-2-0425-1B on GSM8K (5 points).
 
 \subsection*{(a) Evaluation script and metrics}
 
-The script \texttt{scripts/eval\_prompting\_baselines.py} starts a vLLM server
-(\texttt{allenai/OLMo-2-0425-1B}), generates one completion per problem on the
-full GSM8K test split (1{,}319 problems) using temperature 1.0 and a 512-token
-budget, and scores each generation with the appropriate reward function from
-\texttt{cs336\_alignment.drgrpo\_grader}: \texttt{question\_only\_reward\_fn}
-for \texttt{question\_only} (expects a final answer in \verb|\boxed{}|) and
-\texttt{r1\_zero\_reward\_fn} for the two \texttt{r1\_zero} variants (expects
-\texttt{</think>~<answer>~\ldots~</answer>} format). Every generation is
-bucketed into one of three categories: Cat.~1 (format reward $=1$, answer
-reward $=1$), Cat.~2 (format reward $=1$, answer reward $=0$), or Cat.~3
-(format reward $=0$, answer reward $=0$). A format reward of $0$ forces an
-answer reward of $0$, since the answer cannot be parsed. Results are written to
-\texttt{experiments/prompting\_baselines/}.
+The script \texttt{scripts/eval\_prompting\_baselines.py} evaluates
+\texttt{allenai/OLMo-2-0425-1B} on the full GSM8K test set (1{,}319 problems,
+temperature 1.0, 512-token budget). Each output is scored with the matching
+reward function from \texttt{cs336\_alignment.drgrpo\_grader}. Outputs are
+placed into Cat.~1 (format $1$, answer $1$), Cat.~2 (format $1$, answer $0$),
+or Cat.~3 (format $0$, answer $0$). A format reward of $0$ forces an answer
+reward of $0$.
 
 \begin{table}[H]
 \centering
@@ -122,51 +116,36 @@ Cat.~3: format reward $0$, answer reward $0$.}
 \end{table}
 
 \paragraph{Manual audit of Category 2.}
-A random sample of 12--15 Cat.~2 outputs was inspected per prompt strategy.
+A random sample of 12--15 Cat.~2 outputs was inspected per prompt.
 \begin{itemize}
-  \item \texttt{question\_only}: 0/12 were actually correct but misparsed. Responses
-    either produce garbled LaTeX (e.g., phantom symbols, mismatched braces) or
-    place the numeric answer outside a \verb|\boxed{}|. The arithmetic itself is
-    wrong in every sampled case.
-  \item \texttt{r1\_zero}: 0/15 were actually correct but misparsed. The model
+  \item \texttt{question\_only}: 0/12 were correct but misparsed. Responses
+    produce garbled LaTeX or place the answer outside \verb|\boxed{}|.
+    The arithmetic is wrong in every sampled case.
+  \item \texttt{r1\_zero}: 0/15 were correct but misparsed. The model
     produces well-formed \texttt{</think>~<answer>~\ldots~</answer>} but
-    consistently commits arithmetic errors (e.g., computing only one month
-    instead of two, or applying the wrong multiplier for overtime pay).
-  \item \texttt{r1\_zero\_three\_shot}: 0/12 were actually correct but misparsed.
-    The model again formats correctly but reasons wrongly (e.g., confusing
-    dozens with units, or misinterpreting ``half as many episodes as minutes per
-    episode'').
+    makes arithmetic errors (e.g., computing only one month instead of two).
+  \item \texttt{r1\_zero\_three\_shot}: 0/12 were correct but misparsed.
+    The model formats correctly but reasons wrongly (e.g., confusing
+    dozens with units).
 \end{itemize}
 
 \paragraph{Manual audit of Category 3.}
 \begin{itemize}
-  \item \texttt{question\_only}: 0/8 correct but misparsed. The base model treats
-    the prompt as a signal to generate additional math problems or entirely
-    off-topic text; a \verb|\boxed{}| answer almost never appears.
-  \item \texttt{r1\_zero}: $\approx$1/12 could be argued correct-but-misparsed.
-    The dominant failure mode is the model inserting the answer \emph{outside}
-    the \texttt{<answer>} tag (e.g., writing the answer after \texttt{</think>}
-    but before opening \texttt{<answer>}, or appending a ``User:'' turn). In
-    every inspected case the answer itself is arithmetically wrong, so the
-    misparsed-but-correct count is effectively 0.
-  \item \texttt{r1\_zero\_three\_shot}: 2/10 appear correct but misparsed. The
-    model correctly computes the answer inside \texttt{</think>} but omits the
-    \texttt{<answer>~\ldots~</answer>} wrapper, stopping immediately after
-    \texttt{</think>}. The grader therefore assigns format reward 0 even though
-    the numeric answer is right.
+  \item \texttt{question\_only}: 0/8 correct but misparsed. The model
+    generates more math problems or off-topic text. A \verb|\boxed{}| answer
+    almost never appears.
+  \item \texttt{r1\_zero}: $\approx$1/12 could be argued correct but misparsed.
+    The main failure is the model placing the answer outside the
+    \texttt{<answer>} tag. In every inspected case the arithmetic is wrong,
+    so the count of correct-but-misparsed outputs is effectively 0.
+  \item \texttt{r1\_zero\_three\_shot}: 2/10 appear correct but misparsed.
+    The model computes the right answer inside \texttt{</think>} but omits the
+    \texttt{<answer>~\ldots~</answer>} wrapper. It stops right after
+    \texttt{</think>}. The grader assigns format reward 0 even though
+    the number is right.
 \end{itemize}
 
 \paragraph{Example prompts and responses.}
-
-\subparagraph{\texttt{question\_only} (Cat.~1 --- the single correct response).}
-\begin{quote}\small
-\textbf{Prompt:} Luke is buying fabric for new curtains. There are five windows.
-Each window is 35 inches wide and Luke needs to buy fabric equal to 2 times the
-total width of the windows. How much fabric should he buy?
-Please put your final answer within \textbackslash boxed\{\}.\\[4pt]
-\textbf{Response:} \ldots Total width $= 35\times5=175$ inches. Total fabric
-$= 2\times175=350$ inches. The final answer is: \textbackslash boxed\{350\}.
-\end{quote}
 
 \subparagraph{\texttt{question\_only} (Cat.~3 --- typical failure).}
 \begin{quote}\small
@@ -174,16 +153,6 @@ $= 2\times175=350$ inches. The final answer is: \textbackslash boxed\{350\}.
 hamsters and the other 3 have 5 guinea pigs. How many rodents did the pet shop
 have in total? Please put your final answer within \textbackslash boxed\{\}.\\[4pt]
 \textbf{Response:} Pet Pet Pet Pet Pet Pet Pet Pet Pet
-\end{quote}
-
-\subparagraph{\texttt{r1\_zero} (Cat.~1).}
-\begin{quote}\small
-\textbf{Prompt:} \ldots User: James runs 12 miles a day for 5 days a week. If
-he runs 10 miles an hour how many hours does he run a week?\\
-Assistant: \texttt{<think>}\\[4pt]
-\textbf{Response:} It would equate to 6 hours since 10 miles per hour times 6
-hours per day equals 60 miles per week, and since 12 miles is the mode of the
-distance. \texttt{</think> <answer> 6 hours. </answer>}
 \end{quote}
 
 \subparagraph{\texttt{r1\_zero} (Cat.~2 --- format correct, wrong answer).}
@@ -195,7 +164,7 @@ Assistant: \texttt{<think>}\\[4pt]
 \textbf{Response:} John went to physical therapy for 6 weeks. Each week he went
 twice for 2 hours at a time. So he attended 2$\times$6 $=$ 12 hours total.
 \texttt{</think> <answer>}The cost is 125$\times$12 $=$ \$1500.\texttt{</answer>}
-\quad[\textit{GT: \$3000; model ignored the ``per session'' structure.}]
+\quad[\textit{GT: \$3000; model missed the ``per session'' factor.}]
 \end{quote}
 
 \subparagraph{\texttt{r1\_zero\_three\_shot} (Cat.~1).}
@@ -209,40 +178,28 @@ is $600\times1.25=750$ mph.
 \texttt{</think> <answer> 750 </answer>}
 \end{quote}
 
-\subparagraph{\texttt{r1\_zero\_three\_shot} (Cat.~2 --- format correct, wrong answer).}
-\begin{quote}\small
-\textbf{Prompt:} \ldots User: If Chester eats 3 eggs a day for 30 days then 5
-eggs a day for 30 days, how many dozens does he need for 60 days?\\
-Assistant: \texttt{<think>}\\[4pt]
-\textbf{Response:} $3\times30 + 5\times30 = 240$ eggs total.
-\texttt{</think> <answer> 240 </answer>}
-\quad[\textit{GT: 20 dozen; model forgot to divide by 12.}]
-\end{quote}
-
 \subsection*{(b) Characterizing model behavior}
 
 \paragraph{\texttt{question\_only}.}
-The base model treats this prompt as a signal to continue generating math
-content, not to answer the question. Most outputs (76.8\% Cat.~3) append
-unrelated word problems, emit LaTeX boilerplate, or repeat near-nonsense tokens
-(``Pet Pet Pet\ldots''). The \verb|\boxed{}| convention rarely appears, so even
-correct arithmetic is almost never wrapped right. Plain prompting does not put
-the base model in a task-solving mode.
+The model treats this prompt as a signal to keep generating math content. It
+does not try to answer the question. Most outputs (76.8\% Cat.~3) add unrelated
+word problems, emit LaTeX boilerplate, or repeat near-nonsense tokens
+(``Pet Pet Pet\ldots''). The \verb|\boxed{}| format almost never appears.
+Plain prompting does not put the model in a task-solving mode.
 
 \paragraph{\texttt{r1\_zero}.}
-Pre-seeding \texttt{<think>} and the User/Assistant frame raise the format rate
-to 62.0\%. The model produces a reasoning chain before \texttt{</think>}, then
-a numeric answer in \texttt{<answer>} tags. The arithmetic is usually wrong: it
-shortcuts multi-step problems or hedges with an expression. Cat.~3 failures
-(38.0\%) come from never closing \texttt{<think>}, writing the answer outside
-\texttt{<answer>} tags, or appending an extra ``User:'' turn. The prompt shapes
-format but not correctness.
+Starting with \texttt{<think>} and the User/Assistant frame raises the format
+rate to 62.0\%. The model writes a reasoning chain before \texttt{</think>},
+then puts a number in \texttt{<answer>} tags. The arithmetic is usually wrong.
+Cat.~3 failures (38.0\%) come from never closing \texttt{<think>}, placing the
+answer outside \texttt{<answer>} tags, or adding an extra ``User:'' turn.
+The prompt shapes format but not correctness.
 
 \paragraph{\texttt{r1\_zero\_three\_shot}.}
 Three worked examples raise the format rate to 95.0\% and accuracy to 18.65\%.
-The demonstrations teach the expected length and style, which cuts chat-style
-derailments. Cat.~3 failures drop to 5.0\%, mostly outputs that close
-\texttt{</think>} without opening \texttt{<answer>}. Few-shot prompting mainly
+The examples teach the expected length and style. Chat-style failures become
+rare. Cat.~3 failures drop to 5.0\%; most are outputs that end at
+\texttt{</think>} with no \texttt{<answer>} tag. Few-shot prompting mainly
 fixes format; the remaining errors are arithmetic.
 
 % =====================================================
@@ -311,7 +268,9 @@ For the mean over $n$ samples:
 \boxed{\;\Var\!\left[\frac{1}{n}\sum_{i=1}^n (r(A_i)-b)\nabla_\theta \log \policy(A_i)\right]
 = \frac{p(1-p)(1-p-b)^2}{n}.\;}
 \]
-The variance is minimized at $b^\star = 1-p$, where it equals zero. The optimal baseline is $1-p$, not the expected reward $p$. The score function has nonzero magnitude on $A=0$, so the baseline must also account for that side.
+The variance reaches zero at $b^\star = 1-p$. The optimal baseline is $1-p$,
+not the expected reward $p$. The score function has nonzero size on $A=0$,
+so the baseline must also account for that side.
 
 \subsection*{(c) Variance with the population-mean baseline $b=p$}
 Substituting $b=p$ in part (b):
@@ -322,7 +281,10 @@ Compared to part (a), the ratio is
 \[
 \frac{(1-2p)^2}{(1-p)^2}.
 \]
-The baseline-adjusted variance is lower than the unadjusted variance when $p \le 2/3$. It is higher when $p > 2/3$. At $p=1/2$ the adjusted variance is zero. At $p \to 1$ the adjusted variance is much larger than the unadjusted one. The population-mean baseline is therefore sometimes better and sometimes worse, depending on $p$.
+The baseline-adjusted variance is lower than the unadjusted variance for
+$0<p<2/3$, equal at $p=2/3$, and higher for $p>2/3$. At $p=1/2$ the adjusted
+variance is zero. At $p \to 1$ the adjusted variance is much larger. The
+population-mean baseline is sometimes better and sometimes worse, depending on $p$.
 
 % -----------------------------------------------------
 \subsection{Implementing on-policy GRPO}
@@ -381,60 +343,141 @@ Use GRPO to improve OLMo-2-0425-1B performance on GSM8K (10 points).
 \subsection*{(a) Training script}
 \deliverable{A script to run GRPO (standard, on-policy) on GSM8K and OLMo-2-0425-1B.}
 
-The script is \texttt{scripts/grpo.py}. It takes CLI flags for the model, prompt style, data paths, group size, batch sizes, gradient accumulation steps, learning rate, max grad norm, advantage normalizer, loss normalization, and importance-reweighting method. The main loop is:
+The script is \texttt{scripts/grpo.py}. It takes CLI flags for the model,
+prompt style, data paths, group size, batch sizes, gradient accumulation steps,
+learning rate, max grad norm, advantage normalizer, loss normalization, and
+importance-reweighting method. The main loop is:
 \begin{enumerate}
-  \item Parse hyperparameters; load train (6{,}400 examples) and val (1{,}024 examples) splits of GSM8K.
-  \item Start the vLLM server on GPU~1; set the stop string to \texttt{</answer>} for \texttt{r1\_zero} prompts.
-  \item Load the HuggingFace policy on GPU~0; build AdamW($\beta_1=0.9$, $\beta_2=0.95$, wd$=0$).
-  \item Initialize W\&B; log all hyperparameters.
-  \item For each rollout step: (i) sync policy weights into vLLM via NCCL; (ii) sample a rollout batch of $B{=}256$ completions ($G{=}8$ per prompt); (iii) call \texttt{grpo\_train\_step}; (iv) log train metrics. Every 10 steps evaluate on 1{,}024 val examples. Every 40 steps write a rollout JSON for qualitative inspection.
-  \item Run a final val evaluation, save the checkpoint, and write \texttt{final\_metrics.json}.
+  \item Parse hyperparameters. Load train (6{,}400 examples) and val
+    (1{,}024 examples) splits of GSM8K.
+  \item Start the vLLM server on GPU~1. Set the stop string to
+    \texttt{</answer>} for \texttt{r1\_zero} prompts.
+  \item Load the policy on GPU~0. Build AdamW($\beta_1=0.9$, $\beta_2=0.95$, wd$=0$).
+  \item Start W\&B logging. Log all hyperparameters.
+  \item For each rollout step: (i) sync policy weights into vLLM via NCCL;
+    (ii) sample a rollout batch of $B{=}256$ completions ($G{=}8$ per prompt);
+    (iii) call \texttt{grpo\_train\_step}; (iv) log train metrics.
+    Every 10 steps evaluate on 1{,}024 val examples.
+    Every 40 steps write a rollout JSON for inspection.
+  \item Run a final val evaluation, save the checkpoint, and write
+    \texttt{final\_metrics.json}.
 \end{enumerate}
 
 \subsection*{(b) Sanity check ($\sim$50 steps)}
 \deliverable{Evidence that convinced you the script is correct.}
 
-Rather than a dedicated 50-step run, the full 200-step runs served as the sanity check. Three signals confirmed correctness. First, all four seeds reached val reward $>42\%$ by the end of training, well above the $25\%$ target; a broken training loop would stay near the pre-training baseline of $\sim$8\%. Second, rollout logging showed format adoption within the first 40 steps: by step~40 most completions follow the \texttt{</think>~<answer>~\ldots~</answer>} template, whereas at step~0 they do not (see qualitative examples below). Third, val format reward climbed alongside total reward, confirming that the reward function and generation pipeline are correctly wired together.
+The full 200-step runs served as the sanity check. Three signals confirmed
+correctness. First, all four seeds reached val reward $>42\%$ by the end of
+training. This is well above the $25\%$ target. A broken loop would stay near
+the baseline of $\sim$8\%. Second, rollout logging showed format adoption
+within the first 40 steps. By step~40, most completions follow the
+\texttt{</think>~<answer>~\ldots~</answer>} template; at step~0, they do not.
+Third, val format reward climbed alongside total reward. This confirms the
+reward function and generation pipeline are connected correctly.
 
 \subsection*{(c) Full run with 4 seeds (r1\_zero, suggested hyperparameters)}
 \deliverable{Plots per metric, qualitative rollout examples, and a procedure
 that reaches $\geq 25\%$ final validation accuracy.}
 
-Four seeds were run for 200 rollout steps with the suggested hyperparameters (\texttt{lr=1e-5}, \texttt{group\_size=8}, \texttt{rollout\_batch\_size=256}, \texttt{gradient\_accumulation\_steps=32}, \texttt{loss\_normalization=sequence}). Figure~\ref{fig:standard_reward} shows final validation reward per seed.
+Four seeds were run for 200 rollout steps with the suggested hyperparameters
+(\texttt{lr=1e-5}, \texttt{group\_size=8}, \texttt{rollout\_batch\_size=256},
+\texttt{gradient\_accumulation\_steps=32}, \texttt{loss\_normalization=sequence}).
+All metrics are logged each rollout step to \texttt{metrics.jsonl}.
+Figure~\ref{fig:standard_curves} plots each metric over training as the mean
+across the 4 seeds with a $\pm 1$ std band.
+Figure~\ref{fig:standard_reward} shows the final validation reward per seed.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.6\linewidth]{../experiments/writeup/plots/standard_on_policy_reward.png}
+  \begin{subfigure}{0.32\linewidth}\includegraphics[width=\linewidth]{../experiments/writeup/plots/standard_curve_loss.png}\end{subfigure}
+  \begin{subfigure}{0.32\linewidth}\includegraphics[width=\linewidth]{../experiments/writeup/plots/standard_curve_grad_norm.png}\end{subfigure}
+  \begin{subfigure}{0.32\linewidth}\includegraphics[width=\linewidth]{../experiments/writeup/plots/standard_curve_entropy.png}\end{subfigure}\\[2pt]
+  \begin{subfigure}{0.32\linewidth}\includegraphics[width=\linewidth]{../experiments/writeup/plots/standard_curve_train_reward.png}\end{subfigure}
+  \begin{subfigure}{0.32\linewidth}\includegraphics[width=\linewidth]{../experiments/writeup/plots/standard_curve_val_reward.png}\end{subfigure}
+  \begin{subfigure}{0.32\linewidth}\includegraphics[width=\linewidth]{../experiments/writeup/plots/standard_curve_val_length.png}\end{subfigure}
+  \caption{Standard on-policy GRPO (\texttt{r1\_zero}, 200 steps): per-metric training curves, mean $\pm$ std across 4 seeds. Gradient norm is on a log scale; train reward and val reward each show total (C0) and format (C1).}
+  \label{fig:standard_curves}
+\end{figure}
+
+\paragraph{Per-metric behavior.}
+\begin{itemize}
+  \item \textbf{Loss.} Stays near zero throughout (range $[-0.05, 0.00]$).
+    This is expected. The GRPO objective is a surrogate. Only its gradient
+    matters, not its value. Cross-seed spread is small.
+  \item \textbf{Gradient norm.} Rises from $0$ to $\approx 1.0$ within the
+    first few steps. It then stays at the \texttt{max\_grad\_norm} clip
+    threshold. Updates are clip-limited almost every step.
+  \item \textbf{Token entropy.} Drops steadily from $\approx 0.99$ nats to
+    $\approx 0.12$ (halved by step~50, near-floor by step~100). The policy
+    becomes much more predictable as it learns the format and consistent
+    reasoning. The largest cross-seed spread is early ($\std$ up to $0.43$).
+    It shrinks as all seeds reach low entropy.
+  \item \textbf{Train reward.} Format reward is learned fast. It goes from
+    $0.52$ to $\approx 0.89$ by step~50, then levels off near $0.91$.
+    Total (answer) reward climbs more slowly:
+    $0 \to 0.29$ (step~50) $\to 0.48$ (step~100), then levels off.
+    Its mid-training cross-seed std is large ($\approx 0.23$) because seeds
+    learn correct arithmetic at different rates.
+  \item \textbf{Val reward.} Tracks train reward: format reaches $\approx 0.93$,
+    total levels off at $\approx 0.45$. Despite noisy paths, all seeds end at
+    nearly the same final val reward (end $\std = 0.007$).
+  \item \textbf{Val response length.} Flat ($\approx 103$ tokens) through
+    step~50, then grows to $\approx 134$ as the model adopts multi-step
+    reasoning, then levels off. Early length spread across seeds is high
+    ($\std \approx 32$, from pre-format rambling). It drops to $\approx 2$
+    tokens by the end.
+\end{itemize}
+Variance between runs is highest in the first $\sim$100 steps. Entropy, length,
+and answer reward differ a lot across seeds early on. By the end, all runs reach
+very similar final validation reward and format. The procedure is stable at
+convergence.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.55\linewidth]{../experiments/writeup/plots/standard_on_policy_reward.png}
   \caption{Final validation reward per seed, standard on-policy GRPO (\texttt{r1\_zero}, 200 steps).}
   \label{fig:standard_reward}
 \end{figure}
 
 \paragraph{Rollout examples (before vs.\ after training).}
 
-The same question (\emph{``Last month, you borrowed \$100 from your friend. If you promise to pay her today, how much will you give to your friend if both of you agreed to return the money with a 10\% increase?''}, ground truth: 110) was sampled at step~0 and step~160.
+The question below (ground truth: 110) was sampled at step~0 and step~160:
+\emph{``Last month, you borrowed \$100 from your friend. If you promise to pay
+her today, how much will you give to your friend if both of you agreed to return
+the money with a 10\% increase?''}
 
 \subparagraph{Step~0 (before training).}
 \begin{quote}\small
-\textbf{(rollout 1)} \ldots It would equate to \$110 since 10\% of \$100 is \$10, and adding that to the \$100 we borrowed gives us \$110.\texttt{</think>}\\
+\textbf{(rollout 1)} \ldots It would equate to \$110 since 10\% of \$100 is
+\$10, and adding that to the \$100 we borrowed gives us \$110.\texttt{</think>}\\
 \texttt{User:}\\
-\texttt{Assistant:} Your friend will get \$110 if you pay her the amount according to our agreement, with a 10\% increase. Answer:
+\texttt{Assistant:} Your friend will get \$110 \ldots Answer:
 \end{quote}
 \begin{quote}\small
-\textbf{(rollout 2)} \ldots First, I need to calculate the amount as a percentage \ldots \texttt{</think>}\\
+\textbf{(rollout 2)} \ldots First, I need to calculate the amount as a
+percentage \ldots \texttt{</think>}\\
 \texttt{<answer>} \texttt{</answer>}
 \end{quote}
-Format is unreliable: some rollouts re-open the dialogue, others produce empty \texttt{<answer>} tags. Arithmetic reasoning is present but incidental.
+Format is not reliable. Some rollouts re-open the dialogue. Others produce empty
+\texttt{<answer>} tags. Arithmetic reasoning is present but not consistent.
 
 \subparagraph{Step~160 (after training).}
 
-Question: \emph{``One batch of cookies requires 4 cups of flour and 1.5 cups of sugar. How many cups of ingredients are needed in total for 8 batches?''} (ground truth: 44)
+Question: \emph{``One batch of cookies requires 4 cups of flour and 1.5 cups of
+sugar. How many cups of ingredients are needed in total for 8 batches?''}
+(ground truth: 44)
 \begin{quote}\small
-\textbf{(rollout 1)} \ldots for 8 batches, we would need 4 cups of flour per batch times 8 batches = 32 cups of flour. For sugar, 1.5 cups $\times$ 8 = 12 cups. So 32\,+\,12\,=\,44. \texttt{</think> <answer> 32 + 12 = 44 </answer>} \hfill [\textit{correct}]
+\textbf{(rollout 1)} \ldots for 8 batches, we need 4 cups of flour per batch
+times 8 batches = 32 cups of flour. For sugar, 1.5 cups $\times$ 8 = 12 cups.
+So 32\,+\,12\,=\,44. \texttt{</think> <answer> 32 + 12 = 44 </answer>}
+\hfill [\textit{correct}]
 \end{quote}
 \begin{quote}\small
-\textbf{(rollout 2)} \ldots 32 cups of flour and 12 cups of sugar \ldots \texttt{</think> <answer> 32 </answer>} \hfill [\textit{wrong: dropped sugar}]
+\textbf{(rollout 2)} \ldots 32 cups of flour and 12 cups of sugar \ldots
+\texttt{</think> <answer> 32 </answer>} \hfill [\textit{wrong: dropped sugar}]
 \end{quote}
-After training, the \texttt{</think>~<answer>} format is reliable across all rollouts. The reasoning is multi-step and correct; the remaining errors are arithmetic slips (e.g., reporting flour alone instead of the total).
+After training, the \texttt{</think>~<answer>} format is reliable. The
+reasoning is multi-step and correct. The remaining errors are arithmetic slips.
 
 \paragraph{Final accuracy.}
 \begin{center}
@@ -442,16 +485,17 @@ After training, the \texttt{</think>~<answer>} format is reliable across all rol
 \toprule
 Seed & Val reward & Val format reward \\
 \midrule
-0 & 0.482 & 0.917 \\
-1 & 0.468 & 0.930 \\
-2 & 0.484 & 0.947 \\
-3 & 0.422 & 0.842 \\
+0 & 0.426 & 0.815 \\
+1 & 0.471 & 0.947 \\
+2 & 0.447 & 0.876 \\
+3 & 0.435 & 0.884 \\
 \midrule
-Mean & \textbf{0.464} & 0.909 \\
+Mean & \textbf{0.445} & 0.881 \\
 \bottomrule
 \end{tabular}
 \end{center}
-All four seeds exceed the $\geq 25\%$ threshold. Mean final val reward is $46.4\%$ (std $2.5\%$).
+All four seeds exceed the $\geq 25\%$ threshold. Mean final val reward is
+$44.5\%$ (std $1.7\%$).
 
 % --------------------------
 \begin{problembox}{grpo\_learning\_rate}
@@ -459,7 +503,10 @@ Tune the learning rate (3 points).
 \end{problembox}
 \deliverable{Plot of final validation reward vs.\ learning rate, with a few sentences of commentary.}
 
-We swept learning rate over $\{3\!\times\!10^{-6}, 1\!\times\!10^{-5}, 3\!\times\!10^{-5}\}$ with 2 seeds each (all other hyperparameters fixed to the standard on-policy defaults). Figure~\ref{fig:lr_sweep} shows final val reward per learning rate.
+A sweep over $\{3\!\times\!10^{-6}, 1\!\times\!10^{-5}, 3\!\times\!10^{-5}\}$
+was run with 2 seeds each. All other hyperparameters were fixed to the standard
+on-policy defaults. Figure~\ref{fig:lr_sweep} shows final val reward per
+learning rate.
 
 \begin{figure}[H]
   \centering
@@ -468,7 +515,11 @@ We swept learning rate over $\{3\!\times\!10^{-6}, 1\!\times\!10^{-5}, 3\!\times
   \label{fig:lr_sweep}
 \end{figure}
 
-The default $\text{lr}=10^{-5}$ is clearly best ($0.462$). $\text{lr}=3\!\times\!10^{-5}$ is unstable: one seed reaches $0.373$ while the other collapses to $0.000$, giving a large standard deviation. $\text{lr}=3\!\times\!10^{-6}$ is stable but slow, reaching only $0.131$ after 200 steps. The results suggest $10^{-5}$ sits in a sweet spot between too slow and too aggressive.
+The default $\text{lr}=10^{-5}$ is clearly best ($0.462$).
+$\text{lr}=3\!\times\!10^{-5}$ is unstable: one seed reaches $0.373$ and the
+other collapses to $0.000$. The standard deviation is very large.
+$\text{lr}=3\!\times\!10^{-6}$ is stable but slow, reaching only $0.131$ after
+200 steps. $10^{-5}$ sits between too slow and too aggressive.
 
 % --------------------------
 \begin{problembox}{grpo\_prompt\_ablation}
@@ -476,7 +527,10 @@ Prompt ablation (3 points).
 \end{problembox}
 \deliverable{Commentary, supported by plots for referenced metrics.}
 
-We ran GRPO with three prompts --- \texttt{question\_only}, \texttt{r1\_zero}, \texttt{r1\_zero\_three\_shot} --- each for 2 seeds at \texttt{lr=1e-5} and 200 steps. The \texttt{r1\_zero} result uses the 4-seed standard run as a reference. Figure~\ref{fig:prompt_ablation} shows final val reward.
+Three prompts were tested: \texttt{question\_only}, \texttt{r1\_zero}, and
+\texttt{r1\_zero\_three\_shot}. Each was run with 2 seeds at \texttt{lr=1e-5}
+for 200 steps. The \texttt{r1\_zero} result uses the 4-seed standard run as
+a reference. Figure~\ref{fig:prompt_ablation} shows final val reward.
 
 \begin{figure}[H]
   \centering
@@ -485,7 +539,27 @@ We ran GRPO with three prompts --- \texttt{question\_only}, \texttt{r1\_zero}, \
   \label{fig:prompt_ablation}
 \end{figure}
 
-\texttt{r1\_zero} ($0.464$) and \texttt{r1\_zero\_three\_shot} ($0.468$) perform similarly. Both supply a structured reasoning template that the model can latch onto, so GRPO quickly teaches correct arithmetic within an already-reliable format. \texttt{question\_only} is weaker on average ($0.245$) but has very high variance across seeds (one seed reaches $0.434$, the other only $0.057$). The \texttt{question\_only} prompt gives no format hint, so the model must simultaneously learn format and arithmetic. Training is sensitive to initialisation: in the better seed the model discovers the \verb|\boxed{}| convention early and builds on it, while in the worse seed it never does and reward stays low.
+\texttt{r1\_zero} ($0.445$) and \texttt{r1\_zero\_three\_shot} ($0.468$) perform
+similarly. Both give the model a structured reasoning template. GRPO quickly
+teaches correct arithmetic once format is already reliable.
+\texttt{question\_only} is weaker on average ($0.245$) and has very high
+variance across seeds (one seed reaches $0.434$, the other only $0.057$). The
+\texttt{question\_only} prompt gives no format hint, so the model must learn
+format and arithmetic at the same time. In the better seed the model finds the
+\verb|\boxed{}| convention early and builds on it. In the worse seed it never
+does and reward stays low.
+
+\texttt{r1\_zero\_three\_shot} has the best average reward and the lowest
+variance (per-seed $0.467$, $0.470$). \texttt{question\_only} has the highest
+variance. The other logged metrics show the same pattern. \texttt{question\_only}
+reaches near-perfect format reward in both seeds ($0.96$--$1.00$), so format is
+not the problem. The two seeds diverge in response length ($\approx 414$ vs
+$\approx 14$ tokens). The collapsed seed produces very short outputs.
+\texttt{r1\_zero\_three\_shot} stays at a stable $\approx 130$ tokens across
+seeds. The \texttt{question\_only} instability shows up in length, not format.
+\texttt{question\_only} is clearly the least reliable prompt. The gap between
+\texttt{r1\_zero} and \texttt{r1\_zero\_three\_shot} is within one standard
+deviation. It is not significant at 2 seeds.
 
 % =====================================================
 \section{RL Algorithm Variants}
@@ -498,7 +572,18 @@ Think about length normalization (1 point).
 \end{problembox}
 \deliverable{A few sentences of discussion.}
 
-Per-sequence normalization gives every sequence equal weight. A long sequence gets a smaller per-token weight than a short one. This prevents long rollouts from dominating the gradient, but it biases the model toward shorter answers. Constant normalization gives every token equal weight. It is more faithful to the policy gradient, but its scale varies with the total token count in the batch. Per-sequence normalization is better when response lengths vary a lot. Constant normalization is better when you want an unbiased estimate.
+Per-sequence normalization divides each sequence's total token loss by its
+length. A token in a long sequence gets a smaller weight than a token in a
+short one. This prevents long rollouts from dominating the gradient. It also
+introduces a length bias. For an incorrect response, the per-token penalty
+shrinks as the response grows. Long wrong answers are under-penalized. The
+model is then pushed toward longer incorrect responses. This bias is identified
+in the Dr.\ GRPO paper. Constant normalization divides every sequence's loss by
+the same fixed number. Each token gets equal weight. This is closer to the true
+policy gradient and avoids the length bias. Its scale does depend on the total
+token count in the batch. Use per-sequence normalization when response lengths
+vary a lot and stable updates matter. Use constant normalization when an
+unbiased gradient estimate matters more.
 
 \begin{problembox}{compute\_group\_normalized\_rewards\_drgrpo}
 Dr.\ GRPO group normalization (0.5 points).
@@ -520,7 +605,20 @@ Think about RFT (2 points).
 \end{problembox}
 \deliverable{A few sentences of discussion.}
 
-Both objectives have the same expectation for binary reward. RFT keeps a $\nabla\log\policy$ term on correct samples only. Dr.\ GRPO keeps the same term on all samples but subtracts the group mean. For binary reward $\E_y[\mathbf{1}\{r=1\}\nabla\log\policy] = \E_y[r\,\nabla\log\policy]$, and the mean subtraction in Dr.\ GRPO adds zero in expectation. So both estimate $\nabla\eta(x)$. Dr.\ GRPO has lower variance because the group mean is a valid baseline. RFT skips this correction. I would prefer RFT when most groups are all-correct or all-wrong, since the baseline then does almost nothing and RFT is simpler. I would prefer Dr.\ GRPO when groups have mixed rewards, since the baseline gives a real variance reduction.
+For binary reward, both objectives target the same gradient $\nabla\eta(x)$,
+but not exactly at finite $G$. RFT keeps a $\nabla\log\policy$ term on correct
+samples only. Its expectation is
+$\E_y[\mathbf{1}\{r=1\}\nabla\log\policy] = \E_y[r\,\nabla\log\policy] =
+\nabla\eta(x)$. Dr.\ GRPO keeps the term on all samples and subtracts the
+group mean $\mu$. The mean $\mu$ includes the current sample. Because of this,
+the subtraction does not vanish in expectation. It rescales the gradient by
+$\tfrac{G-1}{G}$. The two estimators agree only up to this factor and match
+exactly as $G\to\infty$. Dr.\ GRPO has lower variance because the group mean
+is a valid baseline. RFT skips this correction. I would prefer Dr.\ GRPO when
+groups have mixed rewards. The baseline then gives a real variance reduction.
+I would prefer RFT when most groups are all-correct. In that case, Dr.\ GRPO's
+advantage $r-\mu$ is near zero and its update vanishes. RFT still trains on
+the correct rollouts and is simpler.
 
 % --------------------------
 \subsection{MaxRL}
@@ -529,7 +627,12 @@ Both objectives have the same expectation for binary reward. RFT keeps a $\nabla
 Derive difficulty reweightings induced by different advantage normalizers (6 points).
 \end{problembox}
 
-\paragraph{Setup.} Write $\eta(x) = \E_{y\sim\policy}[r(y|x)]$. The standard policy gradient is $\nabla_\theta J_\theta = \E_x[\nabla\eta(x)]$. The surrogate target is $\nabla_\theta J_{\theta,w} = \E_x[w(x)\nabla\eta(x)]$. The inner expectation over $\sim\policy(\cdot|x)$ has the identity $\E_y[\nabla\log\policy(y|x)] = 0$. So for any function $f(x)$ that does not depend on $y$, $\E_y[f(x)\nabla\log\policy(y|x)] = 0$.
+\paragraph{Setup.} Write $\eta(x) = \E_{y\sim\policy}[r(y|x)]$. The standard
+policy gradient is $\nabla_\theta J_\theta = \E_x[\nabla\eta(x)]$. The surrogate
+target is $\nabla_\theta J_{\theta,w} = \E_x[w(x)\nabla\eta(x)]$. The inner
+expectation over $\sim\policy(\cdot|x)$ satisfies
+$\E_y[\nabla\log\policy(y|x)] = 0$. For any $f(x)$ independent of $y$, this
+gives $\E_y[f(x)\nabla\log\policy(y|x)] = 0$.
 
 \subsection*{(a) Dr.\ GRPO reweighting}
 \deliverable{An expression in terms of a subset of the problem parameters, with a few sentences of justification.}
@@ -538,11 +641,14 @@ With $Z=G$ and $G\to\infty$:
 \[
 \frac{1}{G}\sum_{j=1}^G (r(y^{(j)}|x) - \mu)\nabla_\theta\log\policy(y^{(j)}|x) \;\longrightarrow\; \E_y\bigl[(r - \eta(x))\nabla\log\policy(y|x)\bigr].
 \]
-The mean-subtracted term gives zero contribution since $\eta(x)$ does not depend on $y$. So the limit equals $\E_y[r\nabla\log\policy(y|x)] = \nabla\eta(x)$. Taking expectation over $x$:
+The mean-subtracted term gives zero contribution since $\eta(x)$ does not
+depend on $y$. So the limit equals
+$\E_y[r\nabla\log\policy(y|x)] = \nabla\eta(x)$. Taking expectation over $x$:
 \[
 \boxed{\;w(x) = 1.\;}
 \]
-Dr.\ GRPO weights all prompts equally. It matches the unbiased policy gradient in the on-policy limit.
+Dr.\ GRPO weights all prompts equally. It matches the unbiased policy gradient
+in the on-policy limit.
 
 \subsection*{(b) GRPO (with std normalization) reweighting}
 \deliverable{An expression with derivation.}
@@ -557,7 +663,8 @@ The numerator converges to $\nabla\eta(x)$ as in (a). Combining:
 = \E_x[w(x)\nabla\eta(x)] \;\Rightarrow\;
 \boxed{\;w(x) = \frac{1}{\sqrt{\eta(x)(1-\eta(x))}}.\;}
 \]
-The weight is large at $\eta\approx 0$ and $\eta\approx 1$ and small at $\eta=1/2$. GRPO upweights very easy and very hard prompts.
+The weight is large at $\eta\approx 0$ and $\eta\approx 1$ and small at
+$\eta=1/2$. GRPO upweights very easy and very hard prompts.
 
 \subsection*{(c) MaxRL reweighting (divide by group mean)}
 \deliverable{An expression with derivation.}
@@ -568,14 +675,23 @@ The estimator divides by $\mu$. With $G\to\infty$, $\mu \to \eta(x)$. So
 = \E_x[w(x)\nabla\eta(x)] \;\Rightarrow\;
 \boxed{\;w(x) = \frac{1}{\eta(x)}.\;}
 \]
-The weight is large for hard prompts (small $\eta$) and small for easy prompts. MaxRL upweights hard prompts. Note that the surrogate is $\E_x[\nabla\log\eta(x)]$, i.e.\ the gradient of the log expected reward.
+The weight is large for hard prompts (small $\eta$) and small for easy prompts.
+MaxRL upweights hard prompts.
 
 \begin{problembox}{think\_about\_advantage\_normalization}
 Think about advantage normalization (2 points).
 \end{problembox}
 \deliverable{A few sentences of discussion.}
 
-The three options trade off stability against bias. Std normalization keeps the gradient norm roughly equal across groups, which helps stability, but it upweights very easy and very hard prompts. Mean normalization (MaxRL) upweights hard prompts, which suits curriculum-like training, but it is unstable when the group mean is small. No normalization (Dr.\ GRPO) is the unbiased policy gradient and weights all prompts equally, but the gradient norm then varies a lot across groups. Use std when training is unstable. Use mean when the dataset has many easy prompts and you want to focus on the hard tail. Use none when you want an unbiased estimate.
+The three options balance stability and bias. Std normalization keeps the
+gradient norm roughly equal across groups. This stabilizes training. It also
+upweights very easy and very hard prompts. Mean normalization (MaxRL) upweights
+hard prompts. This is useful when the data has many easy examples. But it is
+unstable when the group mean is near zero. No normalization (Dr.\ GRPO) is the
+unbiased policy gradient. It weights all prompts equally. The gradient norm
+then varies a lot across groups. Use std when training is unstable. Use mean
+when the data has many easy prompts and you want to focus on hard ones. Use
+none when you want an unbiased estimate.
 
 \begin{problembox}{compute\_group\_normalized\_rewards\_maxrl}
 MaxRL group normalization (0.5 points).
@@ -597,7 +713,8 @@ Compare the performance of different RL algorithms (10 points).
 \end{problembox}
 \deliverable{Commentary, supported by plots for referenced metrics.}
 
-Four variants were run with 4 seeds each, zero-shot \texttt{r1\_zero} prompt, and \texttt{loss\_norm=constant}:
+Four variants were run with 4 seeds each, the zero-shot \texttt{r1\_zero}
+prompt, and \texttt{loss\_norm=constant}:
 \texttt{GRPO\_constant} (\texttt{baseline=mean}, \texttt{normalizer=std}),
 \texttt{Dr\_GRPO} (\texttt{baseline=mean}, \texttt{normalizer=none}),
 \texttt{RFT} (\texttt{baseline=none}, \texttt{normalizer=none}),
@@ -612,7 +729,25 @@ Figure~\ref{fig:variants} shows final val reward.
 \end{figure}
 
 \paragraph{Discussion.}
-All four variants exceed $40\%$ final val reward, confirming that the advantage normalizer choice matters less than having a working training loop. \texttt{GRPO\_constant} leads slightly ($0.449$): std normalization stabilises gradient magnitude across groups, which helps early in training when reward variance is large. \texttt{Dr\_GRPO} ($0.437$) and \texttt{MaxRL} ($0.428$) are close; MaxRL's mean-normalizer upweights hard prompts but can be noisy when the group mean is near zero, giving higher seed-to-seed variance ($\pm0.029$). \texttt{RFT} is lowest ($0.416$, $\pm0.010$): without any baseline, the gradient on incorrect rollouts is zero, which is correct in expectation but wastes signal when most groups are mixed. The ranking matches the theoretical prediction: normalizers that reduce variance (std $>$ none) give an advantage, and mean normalization's curriculum effect does not help much at this problem difficulty.
+All four variants exceed $40\%$ final val reward. The choice of advantage
+normalizer matters less than having a working training loop.
+\texttt{GRPO\_constant} leads slightly ($0.449$). Std normalization keeps
+gradient size stable across groups. This helps early in training when reward
+variance is large. \texttt{Dr\_GRPO} ($0.437$) and \texttt{MaxRL} ($0.428$)
+are close. MaxRL's mean normalizer upweights hard prompts but can be noisy
+when the group mean is near zero. Its seed-to-seed variance is highest
+($\pm0.029$). \texttt{RFT} is lowest ($0.416$, $\pm0.010$). Without any
+baseline, the gradient on incorrect rollouts is zero. This is unbiased in
+expectation but wastes signal when most groups are mixed. The ranking matches
+theory: lower-variance normalizers (std $>$ none) help, and the curriculum
+effect of mean normalization does not help much at this difficulty level.
+\texttt{MaxRL} would benefit most from further tuning. It has the highest
+across-seed variance and one weak seed ($0.390$, format $0.83$). A larger
+\texttt{advantage\_eps} or a lower learning rate may help control the
+near-zero-mean division. The top three means ($0.449$, $0.437$, $0.428$) all
+sit within about one standard deviation of each other. Their exact ordering is
+not robust at 4 seeds. The firm conclusions are that every variant trains to
+$0.42$--$0.45$ and that RFT is consistently a little lower.
 
 % =====================================================
 \section{Off-policy RL}
@@ -625,29 +760,37 @@ Derive surrogate objectives for importance reweighting approaches (2 points).
 \end{problembox}
 \deliverable{An expression in terms of a subset of the problem parameters, accompanied by a derivation.}
 
-\paragraph{Setup.} The pairwise estimator groups tokens into pairs $(y_{2t-1}, y_{2t})$. For each pair index $t \in \{1, \dots, L/2\}$ define a mixed policy. It samples all pairs from $\policyold$ except pair $t$, which is sampled from $\policy$:
+\paragraph{Setup.} The pairwise estimator groups tokens into pairs
+$(y_{2t-1}, y_{2t})$. For each pair index $t \in \{1, \dots, L/2\}$ define a
+mixed policy. This policy samples all pairs from $\policyold$ except pair $t$.
+Pair $t$ is sampled from $\policy$:
 \[
 \tilde\pi_t(y|x) =
 \Bigl(\prod_{s\neq t}\policyold(y_{2s-1}|x,y_{<2s-1})\policyold(y_{2s}|x,y_{<2s})\Bigr)
 \cdot \policy(y_{2t-1}|x,y_{<2t-1})\policy(y_{2t}|x,y_{<2t}).
 \]
 
-\paragraph{Surrogate.} The surrogate objective sums the reward under each mixed policy:
+\paragraph{Surrogate.} The surrogate objective sums the reward under each
+mixed policy:
 \[
 \boxed{\;J^{\text{pair}}_\theta = \E_{x}\!\left[\sum_{t=1}^{L/2}\E_{y\sim\tilde\pi_t}\!\bigl[r(y|x)\bigr]\right].\;}
 \]
 
-\paragraph{Derivation.} Take the gradient and reweight each term so it is sampled from $\policyold$ everywhere. For a fixed pair $t$, the ratio of $\tilde\pi_t$ to $\policyold$ is exactly the pair $t$ ratio:
+\paragraph{Derivation.} Take the gradient and reweight each term so all
+tokens are sampled from $\policyold$. For a fixed pair $t$, the ratio of
+$\tilde\pi_t$ to $\policyold$ is exactly the pair $t$ ratio:
 \[
 \frac{\tilde\pi_t(y|x)}{\policyold(y|x)}
 = \frac{\policy(y_{2t-1}|x,y_{<2t-1})\policy(y_{2t}|x,y_{<2t})}{\policyold(y_{2t-1}|x,y_{<2t-1})\policyold(y_{2t}|x,y_{<2t})}.
 \]
-Applying the log-derivative trick on the pair $t$ factors only (the other factors do not depend on $\theta$):
+We apply the log-derivative trick to the pair $t$ factors only. The other
+factors do not depend on $\theta$:
 \begin{align*}
 \nabla_\theta \E_{y\sim\tilde\pi_t}[r(y|x)]
 &= \E_{y\sim\policyold}\!\Bigl[\tfrac{\tilde\pi_t(y|x)}{\policyold(y|x)}\,r(y|x)\,\nabla_\theta\log\bigl(\policy(y_{2t-1}|x,y_{<2t-1})\policy(y_{2t}|x,y_{<2t})\bigr)\Bigr].
 \end{align*}
-Summing over $t$ and over $x$ recovers the given pairwise estimator. So the surrogate above is the objective whose gradient equals that estimator.
+Summing over $t$ and over $x$ recovers the given pairwise estimator. The
+surrogate above is therefore the objective for this estimator.
 
 % --------------------------
 \subsection{Implementation}
@@ -662,7 +805,7 @@ Implemented in \texttt{tests/adapters.py}. Tests pass for both \texttt{noclip} a
 Off-policy policy gradient with sequence-level reweighting (1 point).
 \end{problembox}
 \deliverable{Update \texttt{compute\_policy\_gradient\_loss} to support \texttt{importance\_reweighting\_method = "gspo"}.}
-Implemented in \texttt{tests/adapters.py}. Test passes. The geometric mean is computed in log space to stay numerically stable.
+Implemented in \texttt{tests/adapters.py}. Test passes. The geometric mean is computed in log space for numerical stability.
 
 \begin{problembox}{grpo\_train\_step\_off\_policy}
 Off-policy GRPO train step (2.5 points).
@@ -678,10 +821,14 @@ Compare the performance of different off-policy algorithms (10 points).
 \end{problembox}
 \deliverable{Commentary, supported by plots for referenced metrics.}
 
-Four off-policy variants were run with 4 seeds each and \texttt{r1\_zero}, using the same hyperparameters as the standard on-policy run but with the specified importance-reweighting method:
-\texttt{offpolicy\_naive} (no reweighting, \texttt{method=none}),
-\texttt{offpolicy\_noclip} (\texttt{noclip}),
-\texttt{offpolicy\_clip} (\texttt{grpo}, $\varepsilon=0.2$),
+Four off-policy variants were run with 4 seeds each and \texttt{r1\_zero}.
+The runs use \texttt{rollout\_batch\_size=256}, \texttt{train\_batch\_size=8},
+and \texttt{gradient\_accumulation\_steps=1}. This gives 32 optimizer steps
+per inference batch. The policy drifts away from the sampling policy
+$\policyold$ across these steps. All other hyperparameters match the standard
+on-policy run. The variants are \texttt{offpolicy\_naive} (no reweighting,
+\texttt{method=none}), \texttt{offpolicy\_noclip} (\texttt{noclip}),
+\texttt{offpolicy\_clip} (\texttt{grpo}, $\varepsilon=0.2$), and
 \texttt{offpolicy\_gspo} (\texttt{gspo}, $\varepsilon=3\!\times\!10^{-4}$).
 Figure~\ref{fig:offpolicy} shows final val reward.
 
@@ -692,15 +839,75 @@ Figure~\ref{fig:offpolicy} shows final val reward.
   \label{fig:offpolicy}
 \end{figure}
 
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+Variant & Mean val reward & Std & Per-seed \\
+\midrule
+\texttt{offpolicy\_naive}  & 0.115 & 0.199 & 0.000 / 0.000 / 0.001 / 0.459 \\
+\texttt{offpolicy\_noclip} & 0.143 & 0.028 & 0.149 / 0.126 / 0.112 / 0.186 \\
+\texttt{offpolicy\_clip}   & 0.152 & 0.158 & 0.417 / 0.000 / 0.109 / 0.080 \\
+\texttt{offpolicy\_gspo}   & \textbf{0.508} & \textbf{0.012} & 0.490 / 0.519 / 0.519 / 0.504 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
 \paragraph{Discussion.}
-All four variants perform nearly identically ($0.438$--$0.458$). This is expected given the experimental setup: with one gradient step per rollout and \texttt{gradient\_accumulation\_steps=32}, the policy changes only once per batch, so the importance ratio $\pi_\theta / \pi_{\theta_\text{old}}$ is $\approx 1$ throughout each step. When the ratio is always 1, \texttt{noclip}, \texttt{clip}, and \texttt{gspo} all reduce to \texttt{naive}. A meaningful comparison would require multiple gradient steps per rollout (so the policy drifts away from the data-collection policy), at which point clipping would prevent large ratio blow-ups and improve stability. Within this single-step regime, the choice of importance-reweighting method has no observable effect on final reward.
+Going $32\times$ off-policy breaks every method except GSPO. The on-policy run
+reaches $0.445$. Against that reference:
+
+\texttt{naive} collapses on three of four seeds. Reward and format reward fall
+to $0$. Generations saturate the 512-token cap. The mean val reward is very low
+and the seed variance is huge ($\std=0.199$). Without importance correction,
+32 gradient steps on stale rollouts push the policy into a state of very long
+degenerate outputs.
+
+\texttt{noclip} uses unbiased importance weights. This keeps the gradient
+correct. But the method still trains poorly, staying around $0.11$--$0.19$.
+
+\texttt{clip} (token-level PPO clipping) is unstable across seeds. One seed
+reaches $0.417$; another collapses to $0.000$. The mean is low and the variance
+is high ($\std=0.158$). Clipping each token ratio to $[1-\varepsilon,1+\varepsilon]$
+is not enough to control drift over 32 steps. Observed token-level clip
+fractions are large ($\approx 0.2$--$0.45$ of response tokens per step, logged
+as \texttt{train/clip\_fraction}). Token ratios routinely leave $[0.8,1.2]$.
+
+\texttt{gspo} is the clear winner. It is stable across all four seeds
+($\std=0.012$). Its mean ($0.508$) even exceeds the on-policy baseline. GSPO
+clips a sequence-level geometric-mean ratio with a tight
+$\varepsilon=3\!\times\!10^{-4}$. This keeps the per-sequence update bounded.
+Unbounded per-sequence drift is the failure mode of token-level clipping on
+long sequences.
+
+The two clipping methods differ in what the clip fraction measures. Token-level
+clipping reports the fraction of \emph{tokens} clipped ($\approx 0.2$--$0.45$).
+GSPO reports the fraction of \emph{sequences} clipped. With
+$\varepsilon=3\!\times\!10^{-4}$, nearly every sequence is clipped (clip
+fraction near $1$). GSPO caps one geometric-mean ratio per sequence. Even
+near-total clipping leaves a bounded update. Token-level clipping caps
+individual tokens but the rest of the sequence can still drift freely.
+
+GSPO is far more stable than token-level clipping. \texttt{naive},
+\texttt{noclip}, and \texttt{clip} would all likely benefit from a lower
+learning rate or fewer off-policy steps. GSPO works well without further tuning.
+The GSPO result is robust given its low seed variance. The failure of
+\texttt{naive} is clear. The \texttt{clip} ranking is less certain because of
+its high seed-to-seed variance. Its exact mean should be read with caution.
 
 \begin{problembox}{think\_about\_importance\_reweighting}
 Think about importance reweighting (2 points).
 \end{problembox}
 \deliverable{A few sentences of commentary.}
 
-No reweighting has the highest bias and the lowest variance. It works when $\policy$ and $\policyold$ are close, but it breaks down once they drift apart. PPO/GRPO token-level clipping sits in the middle. It caps each ratio in $[1-\varepsilon, 1+\varepsilon]$ to control variance, at the cost of bias on clipped tokens. This is the standard choice for off-policy LLM RL. GSPO clips a sequence-level geometric-mean ratio. It is better when sequences are long and credit belongs at the sequence level. Pick no reweighting for nearly on-policy training, token-level clipping for the standard off-policy case, and GSPO for long sequences.
+No reweighting has the highest bias and the lowest variance. It works when
+$\policy$ and $\policyold$ are close. It breaks down once they drift apart.
+PPO/GRPO token-level clipping is in the middle. It caps each ratio in
+$[1-\varepsilon, 1+\varepsilon]$. This reduces variance at the cost of bias on
+clipped tokens. This is the standard choice for off-policy LLM training. GSPO
+clips a sequence-level geometric-mean ratio. It works better when sequences are
+long and reward belongs at the sequence level. Use no reweighting for nearly
+on-policy training, token-level clipping for the standard off-policy case, and
+GSPO for long sequences.
 
 % =====================================================
 \section{Try your own policy gradient estimator}
@@ -713,11 +920,14 @@ Try your own policy gradient estimator (10 points).
 
 \subsection*{Proposed estimator: leave-one-out baseline (LOO-GRPO)}
 
-The standard GRPO baseline is the group mean. The group mean includes the very sample it is used to adjust. The leave-one-out (LOO) baseline drops that sample. For prompt $i$ and rollout $j$ define
+The standard GRPO baseline is the group mean. This mean includes the current
+sample. The leave-one-out (LOO) baseline excludes the current sample. For
+prompt $i$ and rollout $j$ define
 \[
 \mu_i^{(j)} = \frac{1}{G-1}\sum_{k\neq j} r(y^{(i,k)}|x^{(i)}).
 \]
-The estimator is otherwise identical to Dr.\ GRPO (constant normalization, no std):
+The estimator is otherwise identical to Dr.\ GRPO (constant normalization,
+no std):
 \[
 \boxed{\;\hat g_{\text{LOO}} = \frac{1}{Z}\sum_{i=1}^B \sum_{j=1}^G \sum_{t=1}^{\text{len}(y^{(i,j)})}\bigl(r(y^{(i,j)}|x^{(i)}) - \mu_i^{(j)}\bigr)\,\nabla_\theta\log\policy\bigl(y_t^{(i,j)}\mid x^{(i)}, y_{<t}^{(i,j)}\bigr).\;}
 \]
@@ -725,15 +935,29 @@ This changes one thing relative to Dr.\ GRPO: the baseline.
 
 \subsection*{Theoretical motivation}
 
-The group mean is correlated with the sample it adjusts. The LOO baseline is independent of sample $j$ by construction. So the LOO estimator is unbiased even at finite $G$, while the Dr.\ GRPO estimator carries an $O(1/G)$ bias.
+The group mean includes the current sample. The two are correlated. The LOO
+baseline is independent of sample $j$ by construction. So the LOO estimator is
+unbiased even at finite $G$, while the Dr.\ GRPO estimator carries an
+$O(1/G)$ bias.
 
-For binary reward, the difference is concrete. The Dr.\ GRPO advantage for a correct rollout is $1 - \mu_i$ where $\mu_i$ already counts that rollout's reward. The LOO advantage is $1 - \mu_i^{(j)} = 1 - (\mu_i G - 1)/(G-1)$, which is strictly larger. So LOO gives a larger gradient signal on rare correct rollouts and a stronger penalty on rare incorrect ones. This matches the intuition that the policy gradient should care most about samples that deviate from the rest of the group.
+For binary reward, the difference is clear. The Dr.\ GRPO advantage for a
+correct rollout is $1 - \mu_i$. Here $\mu_i$ already includes that rollout's
+reward. The LOO advantage is $1 - \mu_i^{(j)} = 1 - (\mu_i G - 1)/(G-1)$.
+This value is strictly larger. LOO gives a larger gradient signal on rare
+correct rollouts and a stronger penalty on rare incorrect ones. The policy
+gradient should focus most on samples far from the group average. LOO achieves
+this.
 
-LOO baselines are known to work well in REINFORCE-style estimators (Kool et al.\ 2019; Richter et al.\ 2020). The cost is a tiny extra computation per group (still $O(G)$).
+LOO baselines are known to work well in REINFORCE-style estimators (Kool et al.\
+2019; Richter et al.\ 2020). The cost is a tiny extra computation per group
+(still $O(G)$).
 
 \subsection*{Results}
 
-LOO-GRPO was run against Dr.\ GRPO at 4 seeds with identical hyperparameters (\texttt{lr=1e-5}, \texttt{baseline=loo}/\texttt{mean}, \texttt{advantage\_normalizer=none}, \texttt{loss\_normalization=constant}, 200 rollout steps). Figure~\ref{fig:loo} shows final val reward.
+LOO-GRPO was run against Dr.\ GRPO at 4 seeds with identical hyperparameters
+(\texttt{lr=1e-5}, \texttt{baseline=loo}/\texttt{mean},
+\texttt{advantage\_normalizer=none}, \texttt{loss\_normalization=constant},
+200 rollout steps). Figure~\ref{fig:loo} shows final val reward.
 
 \begin{figure}[H]
   \centering
@@ -743,6 +967,13 @@ LOO-GRPO was run against Dr.\ GRPO at 4 seeds with identical hyperparameters (\t
 \end{figure}
 
 \paragraph{Does it beat the baselines?}
-LOO-GRPO ($0.458 \pm 0.009$) edges out Dr.\ GRPO ($0.446 \pm 0.027$) by $0.012$ in mean final val reward. The LOO seeds are also more consistent (lower std), which matches the theoretical motivation: the LOO baseline is independent of sample $j$ by construction, giving a lower-variance gradient estimate at finite $G$. However, the gap is small relative to the run-to-run variation, and with only 4 seeds per variant it cannot be considered statistically significant. The practical takeaway is that LOO-GRPO is a drop-in replacement for Dr.\ GRPO with no computational overhead and a slight empirical advantage; whether the improvement is robust would require a larger sweep.
+LOO-GRPO ($0.458 \pm 0.009$) edges out Dr.\ GRPO ($0.446 \pm 0.027$) by
+$0.012$ in mean final val reward. The LOO seeds are also more consistent
+(lower std). This matches the theory: the LOO baseline is independent of
+sample $j$. It gives a lower-variance gradient estimate at finite $G$. The gap
+is small relative to the run-to-run variation. With only 4 seeds per variant,
+it is not statistically significant. LOO-GRPO is a drop-in replacement for
+Dr.\ GRPO. It adds no extra computation and shows a slight empirical advantage.
+A larger sweep would be needed to confirm the improvement is robust.
 
 \end{document}

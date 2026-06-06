@@ -4,7 +4,6 @@ import os
 from typing import Any, Callable, Literal
 
 import torch
-import torch.nn.functional as F
 from torch import Tensor
 from torch.utils.data import Dataset
 from transformers import PreTrainedTokenizerBase
@@ -17,6 +16,15 @@ from cs336_alignment.grpo import (
     get_response_log_probs as _get_log_probs,
     grpo_train_step as _grpo_train_step,
     tokenize_prompt_and_output as _tokenize,
+)
+from cs336_alignment.rlhf import (
+    compute_per_instance_dpo_loss as _dpo_loss,
+    get_packed_sft_dataset as _get_packed_sft,
+    iterate_batches as _iterate_batches,
+    masked_normalize as _masked_normalize,
+    parse_gsm8k_response as _parse_gsm8k,
+    parse_mmlu_response as _parse_mmlu,
+    sft_microbatch_train_step as _sft_step,
 )
 
 
@@ -139,19 +147,13 @@ def run_grpo_train_step(
     )
 
 
-"""
-The below adapters are used in the optional
-RLHF / safety part of the Alignment assignment.
-"""
-
-
 def run_masked_normalize(
     tensor: torch.Tensor,
     mask: torch.Tensor,
     dim: int | None = None,
     normalize_constant: float = 1.0,
 ) -> torch.Tensor:
-    raise NotImplementedError
+    return _masked_normalize(tensor=tensor, mask=mask, dim=dim, normalize_constant=normalize_constant)
 
 
 def run_sft_microbatch_train_step(
@@ -160,7 +162,12 @@ def run_sft_microbatch_train_step(
     gradient_accumulation_steps: int,
     normalize_constant: int | None = 1.0,
 ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
-    raise NotImplementedError
+    return _sft_step(
+        policy_log_probs=policy_log_probs,
+        response_mask=response_mask,
+        gradient_accumulation_steps=gradient_accumulation_steps,
+        normalize_constant=normalize_constant,
+    )
 
 
 def get_packed_sft_dataset(
@@ -169,7 +176,7 @@ def get_packed_sft_dataset(
     seq_length: int,
     shuffle: bool,
 ) -> Dataset:
-    raise NotImplementedError
+    return _get_packed_sft(tokenizer=tokenizer, dataset_path=dataset_path, seq_length=seq_length, shuffle=shuffle)
 
 
 def run_iterate_batches(
@@ -177,20 +184,20 @@ def run_iterate_batches(
     batch_size: int,
     shuffle: bool,
 ):
-    raise NotImplementedError
+    return _iterate_batches(dataset=dataset, batch_size=batch_size, shuffle=shuffle)
 
 
 def run_parse_mmlu_response(
     mmlu_example: dict[str, Any],
     model_output: str,
 ) -> str | None:
-    raise NotImplementedError
+    return _parse_mmlu(mmlu_example=mmlu_example, model_output=model_output)
 
 
 def run_parse_gsm8k_response(
     model_output: str,
 ) -> str | None:
-    raise NotImplementedError
+    return _parse_gsm8k(model_output=model_output)
 
 
 def run_compute_per_instance_dpo_loss(
@@ -202,4 +209,12 @@ def run_compute_per_instance_dpo_loss(
     response_chosen: str,
     response_rejected: str,
 ) -> torch.Tensor:
-    raise NotImplementedError
+    return _dpo_loss(
+        lm=lm,
+        lm_ref=lm_ref,
+        tokenizer=tokenizer,
+        beta=beta,
+        prompt=prompt,
+        response_chosen=response_chosen,
+        response_rejected=response_rejected,
+    )

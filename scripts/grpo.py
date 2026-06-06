@@ -217,11 +217,31 @@ def train(args: argparse.Namespace) -> None:
     }
 
     # ------------------------------------------------------------------
-    # Normalization constant for constant-normalization variants
-    # Z = B * G * L  where L = max generation length
+    # On-policy vs off-policy batching
+    #   - train_batch_size == rollout_batch_size  -> one optimizer step per
+    #     inference batch (on-policy).
+    #   - train_batch_size <  rollout_batch_size  -> rollout/train optimizer
+    #     steps per inference batch, with old_log_probs frozen at the sampling
+    #     policy, so the policy drifts off-policy across the inner steps.
+    # ------------------------------------------------------------------
+    train_batch_size = args.train_batch_size or args.rollout_batch_size
+    assert args.rollout_batch_size % train_batch_size == 0, (
+        f"rollout_batch_size {args.rollout_batch_size} not divisible by "
+        f"train_batch_size {train_batch_size}"
+    )
+    assert train_batch_size % args.group_size == 0, (
+        f"train_batch_size {train_batch_size} must be a multiple of group_size "
+        f"{args.group_size} so each optimizer step holds whole groups"
+    )
+    n_train_steps = args.rollout_batch_size // train_batch_size
+
+    # ------------------------------------------------------------------
+    # Normalization constant for constant-normalization variants.
+    # Z is per optimizer step: train_batch_size * L (= rollout_batch_size * L
+    # in the on-policy case, matching the previous behaviour).
     # ------------------------------------------------------------------
     n_prompts_per_batch = args.rollout_batch_size // args.group_size
-    normalization_constant = args.rollout_batch_size * args.sampling_max_tokens
+    normalization_constant = train_batch_size * args.sampling_max_tokens
 
     # ------------------------------------------------------------------
     # Output directory
@@ -230,6 +250,9 @@ def train(args: argparse.Namespace) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     rollouts_dir = out_dir / "rollouts"
     rollouts_dir.mkdir(exist_ok=True)
+    # Per-step metric history for offline plotting (mean/variance over seeds).
+    metrics_path = out_dir / "metrics.jsonl"
+    metrics_path.unlink(missing_ok=True)
 
     # ------------------------------------------------------------------
     # Training loop
@@ -285,60 +308,84 @@ def train(args: argparse.Namespace) -> None:
             for _ in range(args.group_size)
         ]
 
-        # 4a. Compute old log-probs for off-policy importance reweighting
-        old_log_probs = None
-        if args.importance_reweighting_method != "none":
-            old_batch = tokenize_prompt_and_output(
-                prompt_strs=repeated_prompts,
-                output_strs=rollout_responses,
-                tokenizer=tokenizer,
-            )
+        # 4a. Freeze old log-probs at the sampling policy, per train minibatch.
+        # These are computed BEFORE any optimizer step so that across the inner
+        # off-policy steps the ratio pi_theta / pi_theta_old drifts away from 1.
+        # We tokenize each minibatch exactly as grpo_train_step will, so the
+        # padded shapes line up when we slice.
+        need_old = args.importance_reweighting_method != "none"
+        old_log_probs_per_step: list[torch.Tensor | None] = [None] * n_train_steps
+        if need_old:
             policy.eval()
             with torch.no_grad():
-                old_out = get_response_log_probs(
-                    model=policy,
-                    input_ids=old_batch["input_ids"].to(policy_device),
-                    labels=old_batch["labels"].to(policy_device),
-                )
-            old_log_probs = old_out["log_probs"]
+                for k in range(n_train_steps):
+                    s, e = k * train_batch_size, (k + 1) * train_batch_size
+                    old_batch = tokenize_prompt_and_output(
+                        prompt_strs=repeated_prompts[s:e],
+                        output_strs=rollout_responses[s:e],
+                        tokenizer=tokenizer,
+                    )
+                    old_out = get_response_log_probs(
+                        model=policy,
+                        input_ids=old_batch["input_ids"].to(policy_device),
+                        labels=old_batch["labels"].to(policy_device),
+                    )
+                    old_log_probs_per_step[k] = old_out["log_probs"]
             policy.train()
 
-        # 4b. GRPO train step
+        # 4b. Inner training loop: n_train_steps optimizer steps per inference
+        # batch (== 1 on-policy, == rollout/train off-policy).
         cliprange = args.cliprange if args.importance_reweighting_method in ("grpo", "gspo") else None
-        loss, metadata = grpo_train_step(
-            model=policy,
-            tokenizer=tokenizer,
-            optimizer=optimizer,
-            gradient_accumulation_steps=args.gradient_accumulation_steps,
-            max_grad_norm=args.max_grad_norm,
-            reward_fn=reward_fn,
-            repeated_prompts=repeated_prompts,
-            rollout_responses=rollout_responses,
-            repeated_ground_truths=repeated_ground_truths,
-            group_size=args.group_size,
-            baseline=args.baseline,
-            advantage_eps=args.advantage_eps,
-            advantage_normalizer=args.advantage_normalizer,
-            importance_reweighting_method=args.importance_reweighting_method,
-            old_log_probs=old_log_probs,
-            cliprange=cliprange,
-            loss_normalization=args.loss_normalization,
-            normalization_constant=normalization_constant if args.loss_normalization == "constant" else None,
-        )
+        loss_sum = 0.0
+        metric_sums: dict[str, float] = {}
+        for k in range(n_train_steps):
+            s, e = k * train_batch_size, (k + 1) * train_batch_size
+            loss, metadata = grpo_train_step(
+                model=policy,
+                tokenizer=tokenizer,
+                optimizer=optimizer,
+                gradient_accumulation_steps=args.gradient_accumulation_steps,
+                max_grad_norm=args.max_grad_norm,
+                reward_fn=reward_fn,
+                repeated_prompts=repeated_prompts[s:e],
+                rollout_responses=rollout_responses[s:e],
+                repeated_ground_truths=repeated_ground_truths[s:e],
+                group_size=args.group_size,
+                baseline=args.baseline,
+                advantage_eps=args.advantage_eps,
+                advantage_normalizer=args.advantage_normalizer,
+                importance_reweighting_method=args.importance_reweighting_method,
+                old_log_probs=old_log_probs_per_step[k],
+                cliprange=cliprange,
+                loss_normalization=args.loss_normalization,
+                normalization_constant=normalization_constant if args.loss_normalization == "constant" else None,
+            )
+            loss_sum += loss.item()
+            for key in ("grad_norm", "mean_reward", "mean_format_reward", "std_reward", "token_entropy"):
+                metric_sums[key] = metric_sums.get(key, 0.0) + float(metadata.get(key, 0.0))
+            if "clip_fraction" in metadata:
+                cf = metadata["clip_fraction"]
+                metric_sums["clip_fraction"] = metric_sums.get("clip_fraction", 0.0) + float(
+                    cf.item() if hasattr(cf, "item") else cf
+                )
 
         dt = time.monotonic() - t0
         step_metrics = {
-            "train/loss": loss.item(),
-            "train/grad_norm": float(metadata.get("grad_norm", 0.0)),
-            "train/mean_reward": float(metadata.get("mean_reward", 0.0)),
-            "train/mean_format_reward": float(metadata.get("mean_format_reward", 0.0)),
-            "train/std_reward": float(metadata.get("std_reward", 0.0)),
+            "train/loss": loss_sum / n_train_steps,
+            "train/grad_norm": metric_sums.get("grad_norm", 0.0) / n_train_steps,
+            "train/token_entropy": metric_sums.get("token_entropy", 0.0) / n_train_steps,
+            "train/mean_reward": metric_sums.get("mean_reward", 0.0) / n_train_steps,
+            "train/mean_format_reward": metric_sums.get("mean_format_reward", 0.0) / n_train_steps,
+            "train/std_reward": metric_sums.get("std_reward", 0.0) / n_train_steps,
             "train/step_time_s": dt,
         }
-        if "clip_fraction" in metadata:
-            cf = metadata["clip_fraction"]
-            step_metrics["train/clip_fraction"] = float(cf.item() if hasattr(cf, "item") else cf)
+        if "clip_fraction" in metric_sums:
+            step_metrics["train/clip_fraction"] = metric_sums["clip_fraction"] / n_train_steps
         log(step_metrics, global_step)
+
+        # Per-step record for offline plotting (train metrics always; val merged
+        # in when an eval runs this step).
+        record = {"step": global_step, **step_metrics}
 
         # 5. Periodic validation
         if rollout_step % args.eval_interval == 0:
@@ -354,6 +401,10 @@ def train(args: argparse.Namespace) -> None:
                 )
             policy.train()
             log(val_metrics, global_step)
+            record.update(val_metrics)
+
+        with metrics_path.open("a") as _mfh:
+            _mfh.write(json.dumps(record) + "\n")
 
         # 6. Periodic rollout logging
         if rollout_step % args.log_rollouts_interval == 0:
@@ -423,6 +474,11 @@ def make_parser() -> argparse.ArgumentParser:
     # Optimisation
     p.add_argument("--learning-rate",    type=float, default=1e-5)
     p.add_argument("--rollout-batch-size",type=int,  default=256)
+    # Number of responses per optimizer step. When < rollout-batch-size we take
+    # rollout-batch-size / train-batch-size optimizer steps per inference batch,
+    # i.e. off-policy RL. Defaults to rollout-batch-size (fully on-policy: one
+    # optimizer step per inference batch).
+    p.add_argument("--train-batch-size", type=int, default=None)
     p.add_argument("--group-size",       type=int,   default=8)
     p.add_argument("--gradient-accumulation-steps", type=int, default=32)
     p.add_argument("--max-grad-norm",    type=float, default=1.0)

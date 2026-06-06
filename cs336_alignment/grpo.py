@@ -1,14 +1,6 @@
-"""GRPO component implementations.
-
-All functions here are importable both locally and on Modal (since
-cs336_alignment/ is mounted as a Python package in the container image).
-
-tests/adapters.py delegates to these implementations so the test suite
-can validate them.
-"""
-
 from __future__ import annotations
 
+import math
 from typing import Callable, Literal
 
 import torch
@@ -16,16 +8,7 @@ import torch.nn.functional as F
 from torch import Tensor
 
 
-# ---------------------------------------------------------------------------
-# Tokenization
-# ---------------------------------------------------------------------------
-
-def tokenize_prompt_and_output(
-    prompt_strs: list[str],
-    output_strs: list[str],
-    tokenizer,
-) -> dict[str, Tensor]:
-    """Tokenize prompts + outputs without special tokens; build response_mask."""
+def tokenize_prompt_and_output(prompt_strs, output_strs, tokenizer) -> dict[str, Tensor]:
     assert len(prompt_strs) == len(output_strs)
     batch_size = len(prompt_strs)
 
@@ -35,60 +18,35 @@ def tokenize_prompt_and_output(
     max_len = max(len(x) for x in full_ids_list)
 
     pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else 0
-
     padded = torch.full((batch_size, max_len), pad_id, dtype=torch.long)
     is_response = torch.zeros((batch_size, max_len), dtype=torch.long)
-    for i, (p_ids, o_ids) in enumerate(zip(prompt_ids_list, output_ids_list)):
-        seq = p_ids + o_ids
+
+    for i, (prompt_ids, output_ids) in enumerate(zip(prompt_ids_list, output_ids_list)):
+        seq = prompt_ids + output_ids
         padded[i, : len(seq)] = torch.tensor(seq, dtype=torch.long)
-        is_response[i, len(p_ids) : len(p_ids) + len(o_ids)] = 1
+        is_response[i, len(prompt_ids) : len(prompt_ids) + len(output_ids)] = 1
 
     input_ids = padded[:, :-1].contiguous()
     labels = padded[:, 1:].contiguous()
     response_mask = is_response[:, 1:].contiguous()
-
     return {"input_ids": input_ids, "labels": labels, "response_mask": response_mask}
 
 
-# ---------------------------------------------------------------------------
-# Log-probabilities
-# ---------------------------------------------------------------------------
-
-def _compute_entropy(logits: Tensor) -> Tensor:
-    log_probs = F.log_softmax(logits, dim=-1)
-    return -(log_probs.exp() * log_probs).sum(dim=-1)
-
-
-def get_response_log_probs(
-    model: torch.nn.Module,
-    input_ids: Tensor,
-    labels: Tensor,
-    return_token_entropy: bool = False,
-) -> dict[str, Tensor]:
-    """Per-token conditional log-probs log π_θ(y_t | x, y_{<t})."""
-    logits = model(input_ids).logits           # (B, T, V)
+def get_response_log_probs(model, input_ids, labels, return_token_entropy=False) -> dict[str, Tensor]:
+    logits = model(input_ids).logits
     log_probs_all = F.log_softmax(logits, dim=-1)
     log_probs = log_probs_all.gather(-1, labels.unsqueeze(-1)).squeeze(-1)
-
-    out: dict[str, Tensor] = {"log_probs": log_probs}
+    out = {"log_probs": log_probs}
     if return_token_entropy:
-        out["token_entropy"] = _compute_entropy(logits)
+        out["token_entropy"] = -(log_probs_all.exp() * log_probs_all).sum(dim=-1)
     return out
 
 
-# ---------------------------------------------------------------------------
-# Rollout rewards
-# ---------------------------------------------------------------------------
-
-def compute_rollout_rewards(
-    reward_fn: Callable[[str, str], dict[str, float]],
-    rollout_responses: list[str],
-    repeated_ground_truths: list[str],
-) -> tuple[Tensor, dict[str, float]]:
+def compute_rollout_rewards(reward_fn, rollout_responses, repeated_ground_truths):
     assert len(rollout_responses) == len(repeated_ground_truths)
     rewards, fmt_rewards, ans_rewards = [], [], []
-    for response, gt in zip(rollout_responses, repeated_ground_truths):
-        info = reward_fn(response, gt)
+    for response, ground_truth in zip(rollout_responses, repeated_ground_truths):
+        info = reward_fn(response, ground_truth)
         rewards.append(float(info["reward"]))
         fmt_rewards.append(float(info.get("format_reward", 0.0)))
         ans_rewards.append(float(info.get("answer_reward", info["reward"])))
@@ -102,17 +60,13 @@ def compute_rollout_rewards(
     return raw, metadata
 
 
-# ---------------------------------------------------------------------------
-# Advantage normalisation
-# ---------------------------------------------------------------------------
-
 def compute_group_normalized_rewards(
-    raw_rewards: Tensor,
-    group_size: int,
+    raw_rewards,
+    group_size,
     baseline: Literal["mean", "none", "loo"] = "mean",
-    advantage_eps: float = 1e-6,
+    advantage_eps=1e-6,
     advantage_normalizer: Literal["std", "none", "mean"] = "std",
-) -> tuple[Tensor, dict[str, float]]:
+):
     rewards = raw_rewards.float().view(-1, group_size)
     group_mean = rewards.mean(dim=-1, keepdim=True)
     group_std = rewards.std(dim=-1, keepdim=True)
@@ -122,9 +76,7 @@ def compute_group_normalized_rewards(
     elif baseline == "none":
         centered = rewards.clone()
     elif baseline == "loo":
-        G = group_size
-        # leave-one-out mean for sample j: (G*mean - r_j) / (G-1)
-        loo_baseline = (G * group_mean - rewards) / max(G - 1, 1)
+        loo_baseline = (group_size * group_mean - rewards) / max(group_size - 1, 1)
         centered = rewards - loo_baseline
     else:
         raise NotImplementedError(f"baseline={baseline!r}")
@@ -148,71 +100,65 @@ def compute_group_normalized_rewards(
     return advantages, metadata
 
 
-# ---------------------------------------------------------------------------
-# Policy-gradient loss
-# ---------------------------------------------------------------------------
-
 def compute_policy_gradient_loss(
-    raw_rewards_or_advantages: Tensor,
-    policy_log_probs: Tensor,
+    raw_rewards_or_advantages,
+    policy_log_probs,
     importance_reweighting_method: Literal["none", "noclip", "grpo", "gspo"] = "none",
-    old_log_probs: Tensor | None = None,
-    cliprange: float | None = None,
-    response_mask: Tensor | None = None,
-) -> tuple[Tensor, dict[str, Tensor]]:
-    adv = raw_rewards_or_advantages
-    if adv.dim() == 1:
-        adv = adv.unsqueeze(-1)
-    adv = adv.to(policy_log_probs.dtype)
+    old_log_probs=None,
+    cliprange=None,
+    response_mask=None,
+):
+    advantages = raw_rewards_or_advantages
+    if advantages.dim() == 1:
+        advantages = advantages.unsqueeze(-1)
+    advantages = advantages.to(policy_log_probs.dtype)
 
+    # Clamp log-ratio to avoid exp() overflow on extreme off-policy samples.
+    LOG_RATIO_CAP = 20.0
     metadata: dict[str, Tensor] = {}
 
     if importance_reweighting_method == "none":
-        per_token = -adv * policy_log_probs
+        per_token = -advantages * policy_log_probs
+
     elif importance_reweighting_method == "noclip":
-        assert old_log_probs is not None
-        ratio = (policy_log_probs - old_log_probs).exp()
-        per_token = -adv * ratio
+        ratio = (policy_log_probs - old_log_probs).clamp(-LOG_RATIO_CAP, LOG_RATIO_CAP).exp()
+        per_token = -advantages * ratio
+
     elif importance_reweighting_method == "grpo":
-        assert old_log_probs is not None and cliprange is not None
-        ratio = (policy_log_probs - old_log_probs).exp()
+        ratio = (policy_log_probs - old_log_probs).clamp(-LOG_RATIO_CAP, LOG_RATIO_CAP).exp()
         clipped_ratio = torch.clamp(ratio, 1.0 - cliprange, 1.0 + cliprange)
-        unclipped = adv * ratio
-        clipped = adv * clipped_ratio
+        unclipped = advantages * ratio
+        clipped = advantages * clipped_ratio
         per_token = -torch.minimum(unclipped, clipped)
         metadata["clip_fraction"] = (unclipped != clipped).float().mean().detach()
+
     elif importance_reweighting_method == "gspo":
-        assert old_log_probs is not None and cliprange is not None
         log_ratio = policy_log_probs - old_log_probs
         if response_mask is not None:
-            mask = response_mask.to(log_ratio.dtype)
-            denom = mask.sum(dim=-1, keepdim=True).clamp(min=1.0)
-            seq_log_ratio = (log_ratio * mask).sum(dim=-1, keepdim=True) / denom
+            mask_f = response_mask.to(log_ratio.dtype)
+            token_count = mask_f.sum(dim=-1, keepdim=True).clamp(min=1.0)
+            seq_log_ratio = (log_ratio * mask_f).sum(dim=-1, keepdim=True) / token_count
         else:
             seq_log_ratio = log_ratio.mean(dim=-1, keepdim=True)
-        seq_ratio = seq_log_ratio.exp()
+        seq_ratio = seq_log_ratio.clamp(-LOG_RATIO_CAP, LOG_RATIO_CAP).exp()
         clipped_seq_ratio = torch.clamp(seq_ratio, 1.0 - cliprange, 1.0 + cliprange)
-        unclipped = adv * seq_ratio
-        clipped = adv * clipped_seq_ratio
-        seq_loss = -torch.minimum(unclipped, clipped)
-        per_token = seq_loss.expand_as(policy_log_probs)
+        unclipped = advantages * seq_ratio
+        clipped = advantages * clipped_seq_ratio
+        per_token = -torch.minimum(unclipped, clipped).expand_as(policy_log_probs)
         metadata["clip_fraction"] = (unclipped != clipped).float().mean().detach()
+
     else:
         raise NotImplementedError(f"importance_reweighting_method={importance_reweighting_method!r}")
 
     return per_token, metadata
 
 
-# ---------------------------------------------------------------------------
-# Loss aggregation
-# ---------------------------------------------------------------------------
-
 def aggregate_loss_across_microbatch(
-    per_token_policy_gradient_loss: Tensor,
-    mask: Tensor,
+    per_token_policy_gradient_loss,
+    mask,
     loss_normalization: Literal["sequence", "constant"] = "sequence",
-    normalization_constant: int | None = None,
-) -> Tensor:
+    normalization_constant=None,
+):
     mask_f = mask.to(per_token_policy_gradient_loss.dtype)
     masked = per_token_policy_gradient_loss * mask_f
 
@@ -222,102 +168,73 @@ def aggregate_loss_across_microbatch(
         return (per_seq_sum / per_seq_count).mean()
     elif loss_normalization == "constant":
         if normalization_constant is None:
-            raise ValueError("normalization_constant is required for 'constant' mode")
+            raise ValueError("normalization_constant required for 'constant' mode")
         return masked.sum() / float(normalization_constant)
     else:
         raise NotImplementedError(f"loss_normalization={loss_normalization!r}")
 
 
-# ---------------------------------------------------------------------------
-# Full GRPO train step
-# ---------------------------------------------------------------------------
-
 def grpo_train_step(
-    model: torch.nn.Module,
+    model,
     tokenizer,
-    optimizer: torch.optim.Optimizer,
-    gradient_accumulation_steps: int,
-    max_grad_norm: float | None,
-    reward_fn: Callable[[str, str], dict[str, float]],
-    repeated_prompts: list[str],
-    rollout_responses: list[str],
-    repeated_ground_truths: list[str],
-    group_size: int,
+    optimizer,
+    gradient_accumulation_steps,
+    max_grad_norm,
+    reward_fn,
+    repeated_prompts,
+    rollout_responses,
+    repeated_ground_truths,
+    group_size,
     baseline: Literal["mean", "none", "loo"] = "mean",
-    advantage_eps: float = 1e-6,
+    advantage_eps=1e-6,
     advantage_normalizer: Literal["std", "none", "mean"] = "std",
     importance_reweighting_method: Literal["none", "noclip", "grpo", "gspo"] = "none",
-    old_log_probs: Tensor | None = None,
-    cliprange: float | None = None,
+    old_log_probs=None,
+    cliprange=None,
     loss_normalization: Literal["sequence", "constant"] = "sequence",
-    normalization_constant: int | None = None,
-) -> tuple[Tensor, dict]:
-    # Tokenize
-    batch = tokenize_prompt_and_output(
-        prompt_strs=repeated_prompts,
-        output_strs=rollout_responses,
-        tokenizer=tokenizer,
-    )
+    normalization_constant=None,
+):
+    batch = tokenize_prompt_and_output(repeated_prompts, rollout_responses, tokenizer)
     device = next(model.parameters()).device
-    input_ids     = batch["input_ids"].to(device)
-    labels        = batch["labels"].to(device)
+    input_ids = batch["input_ids"].to(device)
+    labels = batch["labels"].to(device)
     response_mask = batch["response_mask"].to(device)
 
-    # Rewards → advantages
-    raw_rewards, reward_meta = compute_rollout_rewards(
-        reward_fn=reward_fn,
-        rollout_responses=rollout_responses,
-        repeated_ground_truths=repeated_ground_truths,
-    )
+    raw_rewards, reward_meta = compute_rollout_rewards(reward_fn, rollout_responses, repeated_ground_truths)
     raw_rewards = raw_rewards.to(device)
-
-    old_log_probs_filtered = old_log_probs.to(device) if old_log_probs is not None else None
+    old_log_probs_on_device = old_log_probs.to(device) if old_log_probs is not None else None
 
     advantages, adv_meta = compute_group_normalized_rewards(
-        raw_rewards=raw_rewards,
-        group_size=group_size,
-        baseline=baseline,
-        advantage_eps=advantage_eps,
-        advantage_normalizer=advantage_normalizer,
+        raw_rewards, group_size, baseline, advantage_eps, advantage_normalizer
     )
 
     batch_size = input_ids.shape[0]
-    assert batch_size % gradient_accumulation_steps == 0, (
-        f"batch_size {batch_size} not divisible by gradient_accumulation_steps "
-        f"{gradient_accumulation_steps}"
-    )
+    assert batch_size % gradient_accumulation_steps == 0
     micro_size = batch_size // gradient_accumulation_steps
 
     optimizer.zero_grad(set_to_none=True)
     total_loss = torch.zeros((), dtype=torch.float32, device=device)
+    entropy_sum = torch.zeros((), dtype=torch.float32, device=device)
+    token_count = torch.zeros((), dtype=torch.float32, device=device)
     aggregated_metadata: dict = {}
 
     for mb_idx in range(gradient_accumulation_steps):
-        s, e = mb_idx * micro_size, (mb_idx + 1) * micro_size
-        mb_input_ids = input_ids[s:e]
-        mb_labels    = labels[s:e]
-        mb_mask      = response_mask[s:e]
-        mb_adv       = advantages[s:e]
+        start, end = mb_idx * micro_size, (mb_idx + 1) * micro_size
+        mb_old = old_log_probs_on_device[start:end] if old_log_probs_on_device is not None else None
 
-        out = get_response_log_probs(model=model, input_ids=mb_input_ids, labels=mb_labels)
+        out = get_response_log_probs(model, input_ids[start:end], labels[start:end], return_token_entropy=True)
         mb_log_probs = out["log_probs"]
 
-        mb_old = old_log_probs_filtered[s:e] if old_log_probs_filtered is not None else None
+        with torch.no_grad():
+            mb_mask_f = response_mask[start:end].to(torch.float32)
+            entropy_sum += (out["token_entropy"].detach().to(torch.float32) * mb_mask_f).sum()
+            token_count += mb_mask_f.sum()
 
         per_token_loss, loss_meta = compute_policy_gradient_loss(
-            raw_rewards_or_advantages=mb_adv,
-            policy_log_probs=mb_log_probs,
-            importance_reweighting_method=importance_reweighting_method,
-            old_log_probs=mb_old,
-            cliprange=cliprange,
-            response_mask=mb_mask,
+            advantages[start:end], mb_log_probs, importance_reweighting_method, mb_old, cliprange, response_mask[start:end]
         )
-
         mb_loss = aggregate_loss_across_microbatch(
-            per_token_policy_gradient_loss=per_token_loss,
-            mask=mb_mask,
-            loss_normalization=loss_normalization,
-            normalization_constant=normalization_constant,
+            per_token_loss, response_mask[start:end], loss_normalization, normalization_constant
         )
 
         scaled = mb_loss if loss_normalization == "constant" else mb_loss / gradient_accumulation_steps
@@ -331,11 +248,17 @@ def grpo_train_step(
         model.parameters(),
         max_norm=max_grad_norm if max_grad_norm is not None else float("inf"),
     )
-    optimizer.step()
+    grad_norm_value = grad_norm.item() if isinstance(grad_norm, Tensor) else float(grad_norm)
+    update_skipped = not math.isfinite(grad_norm_value)
+    if not update_skipped:
+        optimizer.step()
     optimizer.zero_grad(set_to_none=True)
 
+    mean_entropy = (entropy_sum / token_count).item() if float(token_count) > 0 else 0.0
     metadata: dict = {
         "grad_norm": grad_norm.detach() if isinstance(grad_norm, Tensor) else float(grad_norm),
+        "update_skipped": float(update_skipped),
+        "token_entropy": mean_entropy,
         **reward_meta,
         **adv_meta,
     }

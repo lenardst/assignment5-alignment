@@ -32,6 +32,7 @@ import modal
 
 from cs336_alignment.modal_utils import (
     GPU,
+    MAX_CONTAINERS,
     RUN_TIMEOUT_SECONDS,
     SUNET_ID,
     app,
@@ -69,6 +70,8 @@ def _make_args(
     num_rollout_steps: int = 200,
     importance_reweighting_method: str = "none",
     cliprange: float | None = None,
+    train_batch_size: int | None = None,
+    gradient_accumulation_steps: int | None = None,
     run_name: str | None = None,
 ) -> list[str]:
     """Build CLI arguments (no interpreter prefix; run_grpo prepends it)."""
@@ -87,6 +90,10 @@ def _make_args(
         "--importance-reweighting-method", importance_reweighting_method,
         "--wandb-project", "cs336-a5-grpo",
     ]
+    if train_batch_size is not None:
+        args += ["--train-batch-size", str(train_batch_size)]
+    if gradient_accumulation_steps is not None:
+        args += ["--gradient-accumulation-steps", str(gradient_accumulation_steps)]
     if cliprange is not None:
         args += ["--cliprange", str(cliprange)]
     if run_name:
@@ -107,6 +114,7 @@ import subprocess
     timeout=RUN_TIMEOUT_SECONDS,
     volumes={RESULTS_MOUNT: GRPO_VOLUME},
     secrets=[modal.Secret.from_name(WANDB_SECRET_NAME)],
+    max_containers=MAX_CONTAINERS,
 )
 def run_grpo(script_args: list[str]) -> str:
     """Runs inside the container: prepend the container's Python interpreter."""
@@ -300,6 +308,10 @@ def off_policy(
                 advantage_normalizer="std",
                 loss_normalization="sequence",
                 num_rollout_steps=num_rollout_steps,
+                # 32x off-policy: 256 rollouts, 8 per optimizer step => 32
+                # optimizer steps per inference batch (grad_accum=1).
+                train_batch_size=8,
+                gradient_accumulation_steps=1,
                 run_name=f"{variant}_seed{s}",
                 **cfg,
             )
