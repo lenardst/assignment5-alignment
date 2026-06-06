@@ -1,0 +1,58 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Prompting}{2}{section.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces GSM8K prompting results for OLMo-2-0425-1B ($n=1{,}319$, temperature 1.0, seed 0). Cat.~1: format reward $1$, answer reward $1$. Cat.~2: format reward $1$, answer reward $0$. Cat.~3: format reward $0$, answer reward $0$.}}{2}{table.caption.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Manual audit of Category 2.}{2}{section*.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Manual audit of Category 3.}{2}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Example prompts and responses.}{2}{section*.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subparagraph}{\texttt  {question\_only} (Cat.~3 --- typical failure).}{3}{section*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subparagraph}{\texttt  {r1\_zero} (Cat.~2 --- format correct, wrong answer).}{3}{section*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subparagraph}{\texttt  {r1\_zero\_three\_shot} (Cat.~1).}{3}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\texttt  {question\_only}.}{3}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\texttt  {r1\_zero}.}{3}{section*.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\texttt  {r1\_zero\_three\_shot}.}{3}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Group Relative Policy Optimization}{3}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Deriving on-policy GRPO}{3}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Useful identities.}{4}{section*.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Implementing on-policy GRPO}{5}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Experiments}{6}{subsection.2.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Standard on-policy GRPO (\texttt  {r1\_zero}, 200 steps): per-metric training curves, mean $\pm $ std across 4 seeds. Gradient norm is on a log scale; train reward and val reward each show total (C0) and format (C1).}}{7}{figure.caption.21}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:standard_curves}{{1}{7}{Standard on-policy GRPO (\texttt {r1\_zero}, 200 steps): per-metric training curves, mean $\pm $ std across 4 seeds. Gradient norm is on a log scale; train reward and val reward each show total (C0) and format (C1)}{figure.caption.21}{}}
+\@writefile{toc}{\contentsline {paragraph}{Per-metric behavior.}{7}{section*.22}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Final validation reward per seed, standard on-policy GRPO (\texttt  {r1\_zero}, 200 steps).}}{8}{figure.caption.23}\protected@file@percent }
+\newlabel{fig:standard_reward}{{2}{8}{Final validation reward per seed, standard on-policy GRPO (\texttt {r1\_zero}, 200 steps)}{figure.caption.23}{}}
+\@writefile{toc}{\contentsline {paragraph}{Rollout examples (before vs.\ after training).}{8}{section*.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {subparagraph}{Step~0 (before training).}{8}{section*.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {subparagraph}{Step~160 (after training).}{9}{section*.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Final accuracy.}{9}{section*.27}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Final validation reward vs.\ learning rate (mean $\pm $ std, 2 seeds each).}}{10}{figure.caption.28}\protected@file@percent }
+\newlabel{fig:lr_sweep}{{3}{10}{Final validation reward vs.\ learning rate (mean $\pm $ std, 2 seeds each)}{figure.caption.28}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Prompt ablation: final validation reward (mean $\pm $ std). \texttt  {r1\_zero} reference uses 4 seeds; others use 2 seeds.}}{11}{figure.caption.29}\protected@file@percent }
+\newlabel{fig:prompt_ablation}{{4}{11}{Prompt ablation: final validation reward (mean $\pm $ std). \texttt {r1\_zero} reference uses 4 seeds; others use 2 seeds}{figure.caption.29}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}RL Algorithm Variants}{11}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Dr.\ GRPO}{11}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Rejection fine tuning}{12}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}MaxRL}{12}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Setup.}{13}{section*.30}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Experiments}{14}{subsection.3.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces On-policy variant comparison: final validation reward (mean $\pm $ std, 4 seeds).}}{15}{figure.caption.34}\protected@file@percent }
+\newlabel{fig:variants}{{5}{15}{On-policy variant comparison: final validation reward (mean $\pm $ std, 4 seeds)}{figure.caption.34}{}}
+\@writefile{toc}{\contentsline {paragraph}{Discussion.}{15}{section*.35}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Off-policy RL}{15}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Importance reweighting / clipping}{15}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Setup.}{16}{section*.36}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Surrogate.}{16}{section*.37}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Derivation.}{16}{section*.38}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Implementation}{16}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Experiments}{17}{subsection.4.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Off-policy variant comparison: final validation reward (mean $\pm $ std, 4 seeds).}}{17}{figure.caption.39}\protected@file@percent }
+\newlabel{fig:offpolicy}{{6}{17}{Off-policy variant comparison: final validation reward (mean $\pm $ std, 4 seeds)}{figure.caption.39}{}}
+\@writefile{toc}{\contentsline {paragraph}{Discussion.}{17}{section*.40}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Try your own policy gradient estimator}{18}{section.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces LOO-GRPO vs.\ Dr.\ GRPO: final validation reward (mean $\pm $ std, 4 seeds).}}{19}{figure.caption.44}\protected@file@percent }
+\newlabel{fig:loo}{{7}{19}{LOO-GRPO vs.\ Dr.\ GRPO: final validation reward (mean $\pm $ std, 4 seeds)}{figure.caption.44}{}}
+\@writefile{toc}{\contentsline {paragraph}{Does it beat the baselines?}{19}{section*.45}\protected@file@percent }
+\gdef \@abspage@last{20}
